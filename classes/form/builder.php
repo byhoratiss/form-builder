@@ -2,53 +2,75 @@
 /**
 * Generate form()
 */
-abstract class Form_Builder
+class Form_Builder
 {
-	protected $_errors = null;
 	protected $_data = null;
 	protected $_prefix = '%s';
-	protected $_error_file = array();
-	protected $_row_template = '<div class="field :type :name-field :error_class">:label:field:errors</div>';
+	protected $_renderer = 'Form_Renderer';
 
-	static public function factory($object, $data = null, $error_file = null)
+	static public function factory($object, $data = null)
 	{
-		switch(get_class($object))
+		if( $object instanceof Jelly_Model)
 		{
-			case 'Jelly_Model':
-				return new Form_Jelly_Builder($object, $data, $error_file);
-			case 'Validation':
-				return new Form_Validation_Builder($object, $error_file);
+			return new Form_Jelly_Builder($object, $data);
+		}
+		elseif($object instanceof Validation)
+		{
+			return new Form_Validation_Builder($object);
+		}
+		else
+		{
+			return new Form_Builder($object);	
 		}
 	}
 
-	function __construct($data = null, $error_file = null)
+	function __construct($data = null)
 	{
 		$this->data($data);
-		$this->_error_file = $error_file;
 	}
 
-	abstract public function check($extra_validation = null);
-
-	public function errors($name = null)
+	public function row($render, $name, $options = null, $attributes = null )
 	{
-		return $name ? Arr::get($this->_errors, $name) : $this->_errors;
+		return $this->renderer()->row($render, $name, $this->value($name), (array) $options, $attributes);
 	}
 
-	public function field($field_type, $field_name, $options = null)
+	public function field($render, $name, $options = null, $attributes = null )
 	{
-		$class = "Form_Field_".ucfirst($field_type);
-		return new $class($field_name, Arr::merge($this->field_options($field_name), (array) $options ));
+		return $this->renderer()->field($render, $name, $this->value($name), (array) $options, $attributes);
+	}	
+
+	public function label($name, $label = null)
+	{
+		return $this->renderer()->label($name, $label);
 	}
 
-	public function field_options($name)
+
+	public function value($name)
 	{
-		return array( 
-			'prefix' => $this->_prefix,
-			'template' => $this->_row_template,
-			'errors' => $this->errors($name),
-			'value' => isset($this->_data[$name]) ? $this->_data[$name] : null,
-		);
+		return is_array($name) ? Arr::extract($this->_data, $name) : Arr::get($this->_data, $name);
 	}
+
+	public function renderer($renderer = null)
+	{
+		if( $renderer !== null)
+		{
+			$this->_renderer = (string) $renderer;
+			return $this;
+		}
+
+		if(is_string($this->_renderer))
+		{
+			$this->_renderer = new $this->_renderer($this);
+
+			if( ! ($this->_renderer instanceof Form_Renderer)) 
+				throw new Kohana_Exception(":renderer must be a subclass of Form_render", array(":renderer" => get_class($this->_renderer)));
+
+			$this->_renderer->prefix($this->_prefix);
+		}
+			
+
+		return $this->_renderer;
+	}		
 
 	public function prefix($prefix = null)
 	{
@@ -58,7 +80,7 @@ abstract class Form_Builder
 			return $this;
 		}
 		return $this->_prefix;
-	}	
+	}
 
 	public function data($data = null)
 	{
@@ -69,15 +91,5 @@ abstract class Form_Builder
 		}
 		return $this->_data;
 	}
-	
-	public function row_template($row_template = null)
-	{
-		if( $row_template !== null)
-		{
-			$this->_row_template = (string) $row_template;
-			return $this;
-		}
-		return $this->_row_template;
-	}	
 
 }
