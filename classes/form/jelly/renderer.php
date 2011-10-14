@@ -4,8 +4,8 @@
 */
 class Form_Jelly_Renderer extends Form_Renderer
 {
-	protected $_template = '<div class="row :name-row :with-errors">:label:render:errors</div>';
-	protected $_template_checkbox = '<div class="row :name-row :with-errors">:render:label:errors</div>';
+	protected $_template = '<div class="row :type-field :name-row :with-errors">:label:render:errors</div>';
+	protected $_template_checkbox = '<div class="row :type-field :name-row :with-errors">:render:label:errors</div>';
 
 	public function jelly_field($field_name)
 	{
@@ -14,7 +14,6 @@ class Form_Jelly_Renderer extends Form_Renderer
 
 	public function html_validation($field)
 	{
-
 		$validation = array();
 		foreach($field->rules as $rule)
 		{
@@ -79,7 +78,7 @@ class Form_Jelly_Renderer extends Form_Renderer
 			return '';
 		}
 
-		$errors = is_array($errors) ? join(", ", $errors) : $errors;
+		$errors = is_array($errors) ? join(", ", Arr::flatten($errors)) : $errors;
 
 		return '<span class="field-errors">'.$errors.'</span>';
 	}

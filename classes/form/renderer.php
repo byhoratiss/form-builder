@@ -5,8 +5,8 @@
 class Form_Renderer
 {
 	protected $_prefix = '%s';
-	protected $_template = 					'<div class="row :name-row">:label:render</div>';
-	protected $_template_checkbox = '<div class="row :name-row">:render:label</div>';
+	protected $_template = 					'<div class="row :type-field :name-row">:label:render</div>';
+	protected $_template_checkbox = '<div class="row :type-field :name-row">:render:label</div>';
 	protected $_builder;
 
 	public function __construct($builder)
@@ -102,7 +102,7 @@ class Form_Renderer
 	{
 		return $parameters = array(
 			':label' => $this->label( $name, Arr::get($options, 'label')), 
-			':name' => str_replace("_", "-", $name)
+			':name' => str_replace("_", "-", $name),
 		);
 	}
 
@@ -133,6 +133,7 @@ class Form_Renderer
 	{
 		return strtr($this->template($render, $options), Arr::merge(
 			array(
+				':type' => $render,
 				':render' => $this->field($render, $name, $value, (array) $options, $attributes), 
 			),
 			$this->parameters($name, $options)
