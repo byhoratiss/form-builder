@@ -7,16 +7,12 @@ class Form_Jelly_Builder extends Form_Builder
 	protected $_object = null;
 	protected $_error_file = null;
 	protected $_errors = null;
+	protected $_renderer = "Form_Jelly_Renderer";
 
 	public function field($render, $name, $options = null, $attributes = null )
 	{
-		$options = Arr::merge(
-			array(
-				"errors" => $this->errors($name),
-				"object" => $this->_object,
-			),
-			(array) $options
-		);
+		$options = Arr::merge(array("object" => $this->_object), (array) $options );
+
 		$this->renderer()->field($render, $name, $this->value($name), (array) $options, $attributes );
 	}	
 

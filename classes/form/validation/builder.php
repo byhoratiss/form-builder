@@ -7,6 +7,8 @@ class Form_Validation_Builder extends Form_Builder
 	protected $_object = null;
 	protected $_error_file = null;
 	protected $_errors = null;
+	protected $_renderer = "Form_Validation_Renderer";
+
 
 	function __construct(Validation $object)
 	{
