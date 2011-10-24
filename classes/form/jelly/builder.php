@@ -13,7 +13,7 @@ class Form_Jelly_Builder extends Form_Builder
 	{
 		$options = Arr::merge(array("object" => $this->_object), (array) $options );
 
-		$this->renderer()->field($render, $name, $this->value($name), (array) $options, $attributes );
+		return $this->renderer()->field($render, $name, $this->value($name), (array) $options, $attributes );
 	}	
 
 	function __construct(Jelly_Model $object, $data = null)
@@ -36,11 +36,13 @@ class Form_Jelly_Builder extends Form_Builder
 		try{
 			$this->_object->check($extra_validation);
 
+			$this->_errors = null;
+
 			if($save)
 			{
 				$this->save();
 			}
-			
+
 			$this->data(Arr::merge((array) $this->_data, $this->_object->as_array() ));
 
 			return true;
@@ -48,6 +50,9 @@ class Form_Jelly_Builder extends Form_Builder
 		catch(Jelly_Validation_Exception $e)
 		{
 			$this->_errors = $e->errors($this->_error_file);
+
+			$this->data(Arr::merge((array) $this->_data, $this->_object->as_array() ));
+
 			return false;
 		}
 	}

@@ -40,7 +40,7 @@ class Form_Validation_Builder extends Form_Builder
 			),
 			(array) $options
 		);
-		$this->renderer()->field($render, $name, $this->value($name), $options);
+		return $this->renderer()->field($render, $name, $this->value($name), $options, $attributes);
 	}
 
 	public function errors($name = null)

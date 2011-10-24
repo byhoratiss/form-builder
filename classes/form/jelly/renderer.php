@@ -4,8 +4,10 @@
 */
 class Form_Jelly_Renderer extends Form_Renderer
 {
-	protected $_template = '<div class="row :type-field :name-row :with-errors">:label:render:errors</div>';
-	protected $_template_checkbox = '<div class="row :type-field :name-row :with-errors">:render:label:errors</div>';
+	protected $_template = array(
+		'<div class="row :type-field :name-row :with-errors">:label:render:errors</div>',
+		'checkbox' => '<div class="row :type-field :name-row :with-errors">:render:label:errors</div>',
+	);	
 
 	public function jelly_field($field_name)
 	{
@@ -40,7 +42,7 @@ class Form_Jelly_Renderer extends Form_Renderer
 		return $validation;
 	}	
 
-	protected function html_attributes($name, $attributes = null, $custom_attributes = null)
+	public function html_attributes($name, $attributes = null, $custom_attributes = null)
 	{
 		$field = $this->jelly_field($name);
 
@@ -52,7 +54,7 @@ class Form_Jelly_Renderer extends Form_Renderer
 		);
 	}
 
-	protected function parameters($name, $options)
+	public function parameters($name, $options)
 	{
 		$errors = $this->_builder->errors($name);
 
@@ -71,7 +73,7 @@ class Form_Jelly_Renderer extends Form_Renderer
 	 * @return void
 	 * @author 
 	 **/
-	protected function errors($errors)
+	public function errors($errors)
 	{
 		if( ! $errors )
 		{
@@ -89,18 +91,6 @@ class Form_Jelly_Renderer extends Form_Renderer
 	 * =========================
 	 */
 
-	public function image($name, $value, $options, $attributes = null)
-	{
-		$options = $this->options($options, array('thumbnail'));
-		$path = ltrim($this->jelly_field($name)->path, DOCROOT);
-
-		return strtr('<div class="image-field">:image :input</div>', array(
-			":image" => $value ? HTML::image($path.$value) : '<div class="image-placeholder"></div>', 
-			":input" => Form::file($this->html_name($name), $this->html_attributes($name, $attributes))
-		));
-	}	
-
-
 	public function select($name, $value, $options, $attributes = null)
 	{
 		$options = $this->options($options, array('choices', 'include_blank'), array('choices'));
@@ -114,15 +104,7 @@ class Form_Jelly_Renderer extends Form_Renderer
 			$options['choices'] = $choices;
 		}
 
-		if($options['include_blank'])
-		{
-			$options['choices'] = array_merge(
-				array("" => is_string($options['include_blank']) ? $options['include_blank'] : " -- Select --"),
-				$options['choices']
-			);
-		}
-
-		return Form::select($this->html_name($name), $options['choices'], $value, $this->html_attributes($name));
+		return parent::select($name, $value, $options, $attributes);
 	}
 
 

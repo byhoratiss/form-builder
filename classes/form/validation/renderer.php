@@ -4,10 +4,12 @@
 */
 class Form_Validation_Renderer extends Form_Renderer
 {
-	protected $_template = '<div class="row :type-field :name-row :with-errors">:label:render:errors</div>';
-	protected $_template_checkbox = '<div class="row :type-field :name-row :with-errors">:render:label:errors</div>';
+	protected $_template = array(
+		'<div class="row :type-field :name-row :with-errors">:label:render:errors</div>',
+		'checkbox' => '<div class="row :type-field :name-row :with-errors">:render:label:errors</div>',
+	);
 
-	protected function parameters($name, $options)
+	public function parameters($name, $options)
 	{
 		$errors = $this->_builder->errors($name);
 
@@ -16,7 +18,7 @@ class Form_Validation_Renderer extends Form_Renderer
 				':errors' => $this->errors($errors), 
 				':with-errors' => $errors ? 'with-errors' : '',
 			), 
-			parent::parmaters($name)
+			parent::parameters($name, $options)
 		);
 	}	
 
@@ -26,7 +28,7 @@ class Form_Validation_Renderer extends Form_Renderer
 	 * @return void
 	 * @author 
 	 **/
-	protected function errors($errors)
+	public function errors($errors)
 	{
 		if( ! $errors )
 			return '';

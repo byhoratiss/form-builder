@@ -5,9 +5,10 @@
 class Form_Renderer
 {
 	protected $_prefix = '%s';
-	protected $_template = 					'<div class="row :type-field :name-row">:label:render</div>';
-	protected $_template_checkbox = '<div class="row :type-field :name-row">:render:label</div>';
-	protected $_builder;
+	protected $_template = array(
+		'<div class="row :type-field :name-row">:label:render</div>',
+		'checkbox' => '<div class="row :type-field :name-row">:render:label</div>',
+	);
 
 	public function __construct($builder)
 	{
@@ -26,6 +27,7 @@ class Form_Renderer
 		if( $prefix !== null)
 		{
 			$this->_prefix = (string) $prefix;
+
 			return $this;
 		}
 		return $this->_prefix;
@@ -37,7 +39,7 @@ class Form_Renderer
 	 * @return string
 	 * @author Ivan K
 	 **/
-	protected function html_name($name)
+	public function html_name($name)
 	{
 		return sprintf($this->_prefix, $name);
 	}
@@ -48,7 +50,7 @@ class Form_Renderer
 	 * @return string
 	 * @author Ivan K
 	 **/
-	protected function html_id($name)
+	public function html_id($name)
 	{
 		return str_replace("]", "", str_replace("[", "_", $this->html_name($name)));
 	}
@@ -62,7 +64,7 @@ class Form_Renderer
 	 * @return array
 	 * @author Ivan K
 	 **/
-	protected function html_attributes($name, $attributes = null, $custom_attributes = null)
+	public function html_attributes($name, $attributes = null, $custom_attributes = null)
 	{
 		return Arr::merge(
 			(array) $attributes, 
@@ -80,12 +82,12 @@ class Form_Renderer
 	 * @return array
 	 * @author Ivan K
 	 **/
-	protected function options($options, array $names, $required = null)
+	public function options($options, array $names, $required = null)
 	{
-		$options = Arr::extract((array) $options, $names);
-
 		if($required AND ($missing_keys = array_diff($required, array_keys($options))))
 			throw new Kohana_Exception("Missing required options :missing", array(":missing" => join(", ", $missing_keys)));
+
+		$options = Arr::extract((array) $options, $names);
 
 		return $options;
 	}
@@ -98,7 +100,7 @@ class Form_Renderer
 	 * @return array 
 	 * @author Ivan K
 	 **/
-	protected function parameters($name, $options)
+	public function parameters($name, $options)
 	{
 		return $parameters = array(
 			':label' => $this->label( $name, Arr::get($options, 'label')), 
@@ -114,9 +116,9 @@ class Form_Renderer
 	 * @return string
 	 * @author Ivan K
 	 **/
-	protected function template($render, $options = null)
+	public function template($render, $options = null)
 	{
-		return Arr::get((array) $options, 'template', (isset($this->{"_template_$render"}) ? $this->{"_template_$render"} : $this->_template));
+		return Arr::get((array) $options, 'template', Arr::get((array) $this->_template, $render, reset($this->_template)));
 	}
 
 	/**
@@ -176,13 +178,22 @@ class Form_Renderer
 
 	public function select($name, $value, $options, $attributes = null)
 	{
-		list($choices, $include_blank) = $this->options($options, array('choices', 'include_blank'), array('choices'));
+		$options = $this->options($options, array('choices', 'include_blank'), array('choices'));
+		
+		if($options['include_blank'])
+		{
+			$options['choices'] = array_merge(
+				array("" => is_string($options['include_blank']) ? $options['include_blank'] : " -- Select --"),
+				$options['choices']
+			);
+		}
 
-		return Form::select($this->html_name($name), $choices, $value, $field->html_attributes($name));
+		return Form::select($this->html_name($name), $options['choices'], $value, $this->html_attributes($name));
 	}
 
 	public function date($name, $value, $options, $attributes = null)
 	{
+		
 		return Form::input($this->html_name($name), $value, $this->html_attributes($name, $attributes, array('type' => 'date')));
 	}	
 
@@ -193,12 +204,12 @@ class Form_Renderer
 
 	public function hidden($name, $value, $options, $attributes = null)
 	{
-		return Form::input($this->html_name($name), $value, $this->html_attributes($name, $attributes, array('type' => 'date')));
+		return Form::hidden($this->html_name($name), $value, $this->html_attributes($name, $attributes));
 	}
 
 	public function password($name, $value, $options, $attributes = null)
 	{
-		return Form::input($this->html_name($name), $value, $this->html_attributes($name, $attributes, array('type' => 'password')));
+		return Form::password($this->html_name($name), $value, $this->html_attributes($name, $attributes));
 	}			
 
 	public function textarea($name, $value, $options, $attributes = null)
@@ -215,10 +226,10 @@ class Form_Renderer
 
 	public function image($name, $value, $options, $attributes = null)
 	{
-		list($path) = $this->options($options, array('path'), array('path'));
+		$options = $this->options($options, array('path'), array('path'));
 
 		return strtr('<div class="image-field">:image :input</div>', array(
-			":image" => $value ? HTML::image($path.$value) : '<div class="image-placeholder"></div>', 
+			":image" => $value ? HTML::image($options['path'].$value) : '<div class="image-placeholder"></div>', 
 			":input" => Form::file($this->html_name($name), $this->html_attributes($name, $attributes))
 		));
 	}

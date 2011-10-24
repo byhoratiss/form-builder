@@ -54,7 +54,7 @@ class Form_Builder
 	{
 		if( $renderer !== null)
 		{
-			$this->_renderer = (string) $renderer;
+			$this->_renderer = $renderer;
 			return $this;
 		}
 
@@ -67,7 +67,6 @@ class Form_Builder
 
 			$this->_renderer->prefix($this->_prefix);
 		}
-			
 
 		return $this->_renderer;
 	}		
@@ -77,6 +76,11 @@ class Form_Builder
 		if( $prefix !== null)
 		{
 			$this->_prefix = (string) $prefix;
+
+			if(is_object($this->_renderer))
+			{
+				$this->_renderer->prefix($prefix);
+			}			
 			return $this;
 		}
 		return $this->_prefix;
