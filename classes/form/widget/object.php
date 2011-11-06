@@ -1,7 +1,11 @@
 <?php
 /**
-* Form widget data
-*/
+ * Form widget data
+ * @package    OpenBuildings/form-builder
+ * @author     Ivan K
+ * @copyright  (c) 2011 OpenBuildings
+ * @license    http://creativecommons.org/licenses/by-sa/3.0/legalcode
+ */
 class Form_Widget_Object extends Form_Widget
 {
 	public $template = '<div class="row :type-field :name-row :with-errors">:label:field:errors</div>';

@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * 
+ * @package    OpenBuildings/form-builder
+ * @author     Ivan K
+ * @copyright  (c) 2011 OpenBuildings
+ * @license    http://creativecommons.org/licenses/by-sa/3.0/legalcode
+ */
 class Form_Widgets 
 {
 	static public function _list_choices($choices)
