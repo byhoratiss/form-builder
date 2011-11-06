@@ -7,12 +7,6 @@
  */
 class Form_Jelly_BuilderTest extends Kohana_Unittest_TestCase {
 
-	static public function setUpBeforeClass()
-	{
-		require_once Kohana::find_file("tests", "classes/jelly");
-		require_once Kohana::find_file("tests", "classes/model/test/entry");
-	}
-
 	public function test_getters()
 	{
 		$jelly = new Model_Test_Entry();

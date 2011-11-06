@@ -6,17 +6,19 @@ class Form_Builder
 {
 	protected $_data = null;
 	protected $_prefix = '%s';
-	protected $_renderer = 'Form_Renderer';
+
+	protected $widget_helpers = array();
+	protected $widgets = array();
 
 	static public function factory($object, $data = null)
 	{
 		if( $object instanceof Jelly_Model)
 		{
-			return new Form_Jelly_Builder($object, $data);
+			return new Form_Builder_Jelly($object, $data);
 		}
 		elseif($object instanceof Validation)
 		{
-			return new Form_Validation_Builder($object);
+			return new Form_Builder_Validation($object);
 		}
 		else
 		{
@@ -29,21 +31,84 @@ class Form_Builder
 		$this->data($data);
 	}
 
-	public function row($render, $name, $options = null, $attributes = null )
+	public function widgets($name, $class = null)
 	{
-		return $this->renderer()->row($render, $name, $this->value($name), (array) $options, $attributes);
+		if( $class === null )
+			return Arr::get($this->_widgets, $name);
+
+		$this->_widgets[$name] = $class;
+
+		return $this;
 	}
 
-	public function field($render, $name, $options = null, $attributes = null )
+	protected function widget_callback($callback)
 	{
-		return $this->renderer()->field($render, $name, $this->value($name), (array) $options, $attributes);
+		if( strpos($callback, '::') === FALSE )
+		{
+			$callback = array( 'Form_Widgets', $callback);
+		}
+		else
+		{
+			$callback = explode('::', $callback);
+
+			$callback[0] = 'Form_Widgets_'.ucfirst($callback[0]);
+		}
+		return $callback;
+	}
+
+	public function widget($name)
+	{
+		$widget = new Form_Widget($name);
+
+		return $widget->set(array(
+			'prefix' => $this->_prefix,
+			'value' => $this->value($name)
+		));
+	}
+
+	public function row($callback, $name, $options = null, $attributes = null )
+	{
+		return $this->field($callback, $name, $options, $attributes)->render();
+	}
+
+	public function child($name, $form_class = null)
+	{
+		if( ! $form_class)
+		{
+			$form_class = get_class($this);
+		}
+
+		if( $child = Arr::get($this->_data, $name))
+		{
+			if (( $child AND is_array($child)) OR in_array('ArrayAccess', class_implements($child)) )
+			{
+				$children = array();
+				foreach($child as $i => $item)
+				{
+					$children[$i] = new $form_class($item);
+					
+					$children[$i]->prefix(preg_replace('/^([^\[]+)(.*)$/', "{$name}[$i][\$1]\$2", $this->_prefix));
+				}
+				return $children;
+			}
+			else
+			{
+				$child = new $form_class($child);
+				$child->prefix(preg_replace('/^([^\[]+)(.*)$/', "{$name}[\1]\2", $this->_prefix));				
+			}
+		}
+	}
+
+	public function field($callback, $name, $options = null, $attributes = null )
+	{
+		return $this
+			->widget($name)
+			->set(array(
+				'options' => (array) $options,
+				'attributes' => (array) $attributes
+			))
+			->field_callback($this->widget_callback($callback));
 	}	
-
-	public function label($name, $label = null)
-	{
-		return $this->renderer()->label($name, $label);
-	}
-
 
 	public function value($name)
 	{
@@ -76,15 +141,11 @@ class Form_Builder
 		if( $prefix !== null)
 		{
 			$this->_prefix = (string) $prefix;
-
-			if(is_object($this->_renderer))
-			{
-				$this->_renderer->prefix($prefix);
-			}			
 			return $this;
 		}
 		return $this->_prefix;
 	}
+
 
 	public function data($data = null)
 	{

@@ -103,16 +103,20 @@ class Form_RendererTest extends Kohana_Unittest_TestCase {
 	public function provider_widgets()
 	{
 		return array(
-			array("select",   array(), null, "Kohana_Exception"),
-			array("select",   array("choices" => array(1)), "select[name=test] option"),
-			array("select",   array("include_blank" => "BLANK", "choices" => array(1)), "option[value=]"),
-			array("date",     array(), "input[type=date]"),
-			array("input",    array(), "input[type=text]"),
-			array("hidden",   array(), "input[type=hidden]"),
-			array("textarea", array(), "textarea[name=test]"),
-			array("checkbox", array(), "input[type=checkbox]"),
-			array("image",    array(), null, "Kohana_Exception"),
-			array("image",    array('path' => '/'), "input[type=file]"),
+			array("select",    array(), null, "Kohana_Exception"),
+			array("select",    array("choices" => array(1)), "select[name=test] option"),
+			array("select",    array("include_blank" => "BLANK", "choices" => array(1)), "option[value=]"),
+			array("date",      array(), "input[type=date]"),
+			array("input",     array(), "input[type=text]"),
+			array("hidden",    array(), "input[type=hidden]"),
+			array("textarea",  array(), "textarea[name=test]"),
+			array("checkbox",  array(), "input[type=checkbox]"),
+			array("image",     array(), null, "Kohana_Exception"),
+			array("image",     array('path' => '/'), "input[type=file]"),
+			array("checkboxes",array('choices' => array('a' => 'a', 'b' => 'c')), "ul li input[type=checkbox][value=b]"),
+			array("checkboxes",array(), null, "Kohana_Exception"),
+			array("radios",array('choices' => array('a' => 'a', 'b' => 'c')), "ul li input[type=radio][value=b]"),
+			array("radios",array(), null, "Kohana_Exception"),
 		);
 	}
 

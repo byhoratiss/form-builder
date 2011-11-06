@@ -2,19 +2,27 @@
 /**
 * Generate form()
 */
-class Form_Validation_Builder extends Form_Builder
+class Form_Builder_Validation extends Form_Builder
 {
 	protected $_object = null;
 	protected $_error_file = null;
 	protected $_errors = null;
-	protected $_renderer = "Form_Validation_Renderer";
 
+	public function widget($name)
+	{
+		$widget = new Form_Widget_Object($name, $this->_object);
 
-	function __construct(Validation $object)
+		return $widget->set(array(
+			'prefix' => $this->_prefix,
+			'errors' => $this->errors($name),
+			'value' => $this->value($name),
+		));
+	}	
+
+	function __construct($object)
 	{
 		$this->object($object);
-
-		parent::__construct($object->as_array());
+		$this->data($object->as_array());
 	}
 
 	public function check($extra_validation = null)
@@ -31,18 +39,6 @@ class Form_Validation_Builder extends Form_Builder
 		}
 	}	
 
-	public function field($render, $name, $options = null, $attributes = null)
-	{
-		$options = Arr::merge(
-			array(
-				"errors" => $this->errors($name),
-				"object" => $this->_object,
-			),
-			(array) $options
-		);
-		return $this->renderer()->field($render, $name, $this->value($name), $options, $attributes);
-	}
-
 	public function errors($name = null)
 	{
 		return $name ? (is_array($name) ? Arr::extract($this->_errors, $name) : Arr::get($this->_errors, $name)) : $this->_errors;
@@ -52,9 +48,6 @@ class Form_Validation_Builder extends Form_Builder
 	{
 		if( $object !== null)
 		{
-			if( ! ($object instanceof Validation))
-				throw new Kohana_Exception("Object is type :type must be an instance of Validation", array(":type" => get_class($object)));
-
 			$this->_object = $object;
 			return $this;
 		}
