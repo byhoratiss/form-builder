@@ -8,6 +8,8 @@
  */
 class Form_Builder_Jelly extends Form_Builder_Validation
 {
+	protected $_original_data = array();
+
 	public function widget($name)
 	{
 		$widget = parent::widget($name);
@@ -65,6 +67,37 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 
 	public function check($save = FALSE, $extra_validation = null)
 	{
+
+
+		foreach( $this->_data as $field => &$field_data)
+		{
+			$field = $this->object()->meta()->field($field);
+			if(($field instanceof Jelly_Field_ManyToMany) || ($field instanceof Jelly_Field_HasMany ))
+			{
+				if ($field_data AND is_array($field_data))
+				{
+					foreach( $field_data as $i => &$item_data)
+					{
+						if(is_array($item_data))
+						{
+							$id = Arr::get($item_data, Jelly::meta($field->foreign['model'])->primary_key(), null);
+
+							if( ! $id )
+							{
+								unset($item_data[ Jelly::meta($field->foreign['model'])->primary_key()]);
+							}
+							$item = Jelly::factory($field->foreign['model'], $id)->set($item_data);
+							if( ! $item->loaded() OR $item->changed())
+							{
+								$item->save();	
+							}
+
+							$item_data = $item;
+						}
+					}
+				}
+			}
+		}
 		$this->_object->set($this->_data);
 
 		try{

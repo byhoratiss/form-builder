@@ -84,22 +84,33 @@ class Form_Builder
 
 		if( $child = Arr::get($this->_data, $name))
 		{
-			if (( $child AND is_array($child)) OR in_array('ArrayAccess', class_implements($child)) )
+			if (( $child AND (is_array($child)) OR in_array('ArrayAccess', class_implements($child))) )
 			{
 				$children = array();
 				foreach($child as $i => $item)
 				{
 					$children[$i] = new $form_class($item);
-					
-					$children[$i]->prefix(preg_replace('/^([^\[]+)(.*)$/', "{$name}[$i][\$1]\$2", $this->_prefix));
+					$children[$i]->prefix($this->child_prefix($name, $i));
 				}
 				return $children;
 			}
 			else
 			{
 				$child = new $form_class($child);
-				$child->prefix(preg_replace('/^([^\[]+)(.*)$/', "{$name}[\1]\2", $this->_prefix));				
+				$child->prefix($this->child_prefix($name));				
 			}
+		}
+	}
+
+	public function child_prefix($name, $i = null)
+	{
+		if( $i === null) 
+		{
+			return preg_replace('/^([^\[]+)(.*)$/', "{$name}[$i][\$1]\$2", $this->_prefix);
+		}
+		else
+		{
+			return preg_replace('/^([^\[]+)(.*)$/', "{$name}[\1]\2", $this->_prefix);
 		}
 	}
 
