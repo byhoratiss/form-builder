@@ -12,12 +12,11 @@ class Form_Widget_Item
 	protected $_value;
 	protected $_errors;
 
-	function __construct($name, $value = null, $prefix = null, $errors = null) 
+	function __construct($name, $value = null, $prefix = null) 
 	{
 		$this->_name = $name;
 		$this->_value = $value;
 		$this->_prefix = $prefix;
-		$this->_errors = $errors;
 	}
 
 	public function field_name()
@@ -40,8 +39,13 @@ class Form_Widget_Item
 		return $this->_value;
 	}	
 
-	public function errors()
+	public function errors($errors = null)
 	{
+		if( $errors !== null)
+		{
+			$this->_errors = $errors;
+			return $this;
+		}
 		return $this->_errors;
 	}	
 

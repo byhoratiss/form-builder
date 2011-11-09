@@ -15,10 +15,10 @@ class Form_Builder_Validation extends Form_Builder
 	public function widget($name)
 	{
 		$widget = new Form_Widget_Object(Arr::extract($this->_data, (array) $name));
-
+		$widget->errors($this->errors($name));
+		
 		return $widget
 			->object($this->_object)
-			->errors($this->errors((array) $name))
 			->prefix($this->_prefix);
 	}	
 

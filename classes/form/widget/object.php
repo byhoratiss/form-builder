@@ -17,8 +17,9 @@ class Form_Widget_Object extends Form_Widget
 		$errors = array();
 		foreach($this->_items as $item)
 		{
-			$errors = $item->errors();
+			$errors[] = $item->errors();
 		}
+		$errors = join(', ', $errors);
 
 		$this->slots(":errors", "<span class=\"field-errors\">{$errors}</span>");
 		$this->slots(":with-errors", $this->errors() ? 'with-errors' : '');
