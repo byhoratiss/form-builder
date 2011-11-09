@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * HTML Attributes
  * @package    OpenBuildings/form-builder
