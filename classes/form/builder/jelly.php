@@ -78,8 +78,6 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 
 	public function check($save = FALSE, $extra_validation = null)
 	{
-
-
 		foreach( $this->_data as $field => &$field_data)
 		{
 			$field = $this->object()->meta()->field($field);

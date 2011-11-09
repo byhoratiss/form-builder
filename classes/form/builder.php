@@ -14,6 +14,16 @@ class Form_Builder
 	protected $widget_helpers = array();
 	protected $widgets = array();
 
+
+	/**
+	 * Return a ready Form_Builder object, based on the type of the argument
+	 * * Array - Form_Builder
+	 * * Validation - Form_Builder_Validation
+	 * * Jelly_Model - Form_Jelly_Model
+	 * @param mixed $object
+	 * @param array $data 
+	 * @return Form_Builder
+	 */
 	static public function factory($object, $data = null)
 	{
 		if( $object instanceof Jelly_Model)
@@ -33,31 +43,6 @@ class Form_Builder
 	function __construct($data = null)
 	{
 		$this->data($data);
-	}
-
-	public function widgets($name, $class = null)
-	{
-		if( $class === null )
-			return Arr::get($this->_widgets, $name);
-
-		$this->_widgets[$name] = $class;
-
-		return $this;
-	}
-
-	protected function widget_callback($callback)
-	{
-		if( strpos($callback, '::') === FALSE )
-		{
-			$callback = array( 'Form_Widgets', $callback);
-		}
-		else
-		{
-			$callback = explode('::', $callback);
-
-			$callback[0] = 'Form_Widgets_'.ucfirst($callback[0]);
-		}
-		return $callback;
 	}
 
 	public function widget($name)
@@ -122,7 +107,7 @@ class Form_Builder
 				'options' => (array) $options,
 			));
 		$widget->attributes->merge((array) $attributes);
-		return $widget->field_callback($this->widget_callback($callback));
+		return $widget->field_callback($callback);
 		
 	}	
 

@@ -35,9 +35,9 @@ class Form_Widgets
 	{
 		$data->required('choices');
 
-		$choices = self::_list_choices($data->options('choices'));
+		$choices = self::_list_choices(Arr::get($data->options, 'choices'));
 		
-		if($blank = $data->options('include_blank'))
+		if($blank = Arr::get($data->options, 'include_blank'))
 		{
 			$choices = arr::merge( array("" => ($blank === TRUE) ? " -- Select -- " : $blank), $choices );
 		}
@@ -109,7 +109,7 @@ class Form_Widgets
 								 
 		$html = '';
 				 
-		foreach(self::_list_choices($data->options('choices')) as $key => $title)
+		foreach(self::_list_choices(Arr::get($data->options, 'choices')) as $key => $title)
 		{
 			$html .= '<li>'.
 				Form::checkbox($data->name()."[]", $key, $key == $value, array("id" => $data->id().'_'.$key)).
@@ -123,11 +123,11 @@ class Form_Widgets
 	static public function radios(Form_Widget $data)
 	{
 		$data->required('choices');
-		$choices = self::_list_choices($data->options('choices'));
+		$choices = self::_list_choices(Arr::get($data->options, 'choices'));
 		$html = '';
 
 
-		if($blank = $data->options('include_blank'))
+		if($blank = Arr::get($data->options, 'include_blank'))
 		{
 			$choices = arr::merge( array("" => ($blank === TRUE) ? " -- Select -- " : $blank), $choices );
 		}

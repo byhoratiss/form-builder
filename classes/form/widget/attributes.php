@@ -12,7 +12,7 @@ class Form_Widget_Attributes implements ArrayAccess, Iterator, Countable
 
 	public function __construct($container) 
 	{
-		$this->container = $container;
+		$this->container = (array) $container;
 	}
 
 	public function merge($container)

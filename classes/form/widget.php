@@ -96,23 +96,61 @@ class Form_Widget
 		return $this;
 	}
 
+	/**
+	 * Return the real callback funciton, prepending Form_Widget if non is given
+	 * @param string $callback 
+	 * @return array callable array
+	 */
+	protected static function _real_callback($callback)
+	{
+		if( strpos($callback, '::') === FALSE )
+		{
+			$callback = array( 'Form_Widgets', $callback);
+		}
+		else
+		{
+			$callback = explode('::', $callback);
+
+			$callback[0] = 'Form_Widgets_'.ucfirst($callback[0]);
+		}
+		return $callback;		
+	}
+
+	/**
+	 * Execute the widgets callback and place the result in the field slot
+	 * @param array $callback 
+	 * @return $this
+	 */
 	public function field_callback($callback)
 	{
+		$callback = self::_real_callback($callback);
+
 		$this->slot(':type', Arr::get($callback, 1));
 
-		$field = call_user_func($callback, $this);
-		if( $field )
+		if( $field = call_user_func($callback, $this) )
 		{
 			$this->slot(":field", $field);
 		}
 		return $this;
 	}
 
+	/**
+	 * Return a name with prefixed with this widget's prefix
+	 * so 'email' will become parent_form[email] in child forms
+	 * @param string $name 
+	 * @return string
+	 */
 	public function prefixed_name($name)
 	{
 		return sprintf($this->prefix, $name);
 	}
 
+	/**
+	 * Return the prefixed name of the widget, if the name is an array, return an array of prefixed names
+	 * If a name is given return this prefixed name from the array of names
+	 * @param string $name 
+	 * @return string|array
+	 */
 	public function name( $name = null )
 	{
 		if( $name !== null AND is_array($this->name))
@@ -129,11 +167,23 @@ class Form_Widget
 		}
 	}
 
+	/**
+	 * Return an id with prefixed with this widget's prefix
+	 * so 'email' will become parent_form_email in child forms
+	 * @param string $name 
+	 * @return string
+	 */
 	public function prefixed_id($name)
 	{
 		return str_replace("]", "", str_replace("[", "_", $this->prefixed_name($name)));
 	}
 
+	/**
+	 * Return the prefixed id of the widget, if the name is an array, return an array of prefixed ids
+	 * If a name is given return this prefixed name from the array of ids
+	 * @param string $name 
+	 * @return string|array
+	 */
 	public function id( $name = null )
 	{
 		if( $name !== null AND is_array($this->name) )
@@ -150,6 +200,12 @@ class Form_Widget
 		}
 	}
 
+	/**
+	 * Return the value, if the name is an array, return an array of prefixed values
+	 * If a name is given return this name's value
+	 * @param string $name 
+	 * @return string|array
+	 */
 	public function value($name = null)
 	{
 		if($name !== null)
@@ -159,26 +215,10 @@ class Form_Widget
 		return $this->value;
 	}	
 
-	public function options($name = null, $default = null )
-	{
-		if( $name === null)
-		{
-			return $this->options;
-		}
-
-		return Arr::get($this->options, $name, $default);
-	}
-
-	public function attributes($name = null, $default = null )
-	{
-		if( $name === null)
-		{
-			return $this->attributes;
-		}
-		
-		return Arr::get($this->attributes, $name, $default);
-	}
-
+	/**
+	 * Set required options
+	 * @return $this
+	 */
 	public function required()
 	{
 		if(func_num_args() == 0)
