@@ -4,7 +4,7 @@
  * 
  * @package    OpenBuildings/form-builder
  * @author     Ivan K
- * @copyright  (c) 2011 OpenBuildings
+ * @copyright  (c) 2011 OpenBuildings Inc.
  * @license    http://creativecommons.org/licenses/by-sa/3.0/legalcode
  */
 class Form_Widgets 
