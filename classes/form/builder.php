@@ -47,12 +47,10 @@ class Form_Builder
 
 	public function widget($name)
 	{
-		$widget = new Form_Widget($name);
+		$widget = new Form_Widget(Arr::extract($this->_data, (array) $name));
 
-		return $widget->set(array(
-			'prefix' => $this->_prefix,
-			'value' => $this->value($name)
-		));
+		return $widget->prefix($this->_prefix);
+
 	}
 
 	public function row($callback, $name, $options = null, $attributes = null )
@@ -60,60 +58,18 @@ class Form_Builder
 		return $this->field($callback, $name, $options, $attributes)->render();
 	}
 
-	public function child($name, $form_class = null)
-	{
-		if( ! $form_class)
-		{
-			$form_class = get_class($this);
-		}
-
-		if( $child = Arr::get($this->_data, $name))
-		{
-			if (( $child AND (is_array($child)) OR in_array('ArrayAccess', class_implements($child))) )
-			{
-				$children = array();
-				foreach($child as $i => $item)
-				{
-					$children[$i] = new $form_class($item);
-					$children[$i]->prefix($this->child_prefix($name, $i));
-				}
-				return $children;
-			}
-			else
-			{
-				$child = new $form_class($child);
-				$child->prefix($this->child_prefix($name));				
-			}
-		}
-	}
-
-	public function child_prefix($name, $i = null)
-	{
-		if( $i === null) 
-		{
-			return preg_replace('/^([^\[]+)(.*)$/', "{$name}[$i][\$1]\$2", $this->_prefix);
-		}
-		else
-		{
-			return preg_replace('/^([^\[]+)(.*)$/', "{$name}[\1]\2", $this->_prefix);
-		}
-	}
-
 	public function field($callback, $name, $options = null, $attributes = null )
 	{
-		$widget = $this
+		return $this
 			->widget($name)
-			->set(array(
-				'options' => (array) $options,
-			));
-		$widget->attributes->merge((array) $attributes);
-		return $widget->field_callback($callback);
-		
+			->options((array) $options)
+			->attributes((array) $attributes)
+			->field_callback($callback);
 	}	
 
 	public function value($name)
 	{
-		return is_array($name) ? Arr::extract($this->_data, $name) : Arr::get($this->_data, $name);
+		return Arr::get($this->_data, $name);
 	}
 
 	public function renderer($renderer = null)
@@ -147,7 +103,6 @@ class Form_Builder
 		return $this->_prefix;
 	}
 
-
 	public function data($data = null)
 	{
 		if( $data !== null)
@@ -157,5 +112,17 @@ class Form_Builder
 		}
 		return $this->_data;
 	}
+
+	
+	static public function generate_prefix($prefix, $name)
+	{
+		$additional = array_slice(func_get_args(), 2);
+		foreach($additional as $additional_name)
+		{
+			if( $additional_name !== null)
+				$name .= "[$additional_name]";
+		}
+		return preg_replace('/^([^\[]+)(.*)$/', "{$name}[\$1]\$2", $prefix);
+	}	
 
 }

@@ -8,31 +8,51 @@
  */
 class Form_Widget
 {
-	public $template = '<div class="row :type-field :name-row">:label:field</div>';
-	public $attributes = null;
-	public $slots = array(
+	protected $_template = '<div class="row :type-field :name-row">:label:field</div>';
+	protected $_attributes = array();
+	protected $_slots = array(
 		':type' => 'generic',
 		':field' => '',
 	);
-	public $options = array();
-	public $name;
-	public $value;
-	public $prefix = '%s';
+	protected $_options = array();
+	protected $_items = array();
+	protected $_prefix = '%s';
 
-	function __construct( $name )
+	function __construct( $items )
 	{
-		$this->name = $name;
-		$this->attributes = new Form_Widget_Attributes(array('id' => $this->id()));
+		$this->items((array) $items);
+		$this->_attributes = new Form_Widget_Attributes(array('id' => $this->id()));
 	}
 
-	protected function _first_name()
+	protected function _first_item()
 	{
-		return is_array($this->name) ? reset($this->name) : $this->name;
+		reset($this->_items);
+		return current($this->_items);
+	}
+
+	public function field_name()
+	{
+		return $this->_first_item()->name();
+	}
+
+	public function name()
+	{
+		return $this->_first_item()->name();
+	}
+
+	public function id()
+	{
+		return $this->_first_item()->id();
+	}
+
+	public function value()
+	{
+		return $this->_first_item()->value();
 	}
 
 	public function label($label = null)
 	{
-		return Form::label( $this->id(), Arr::get($this->options, 'label', $label ? $label : ucfirst(Inflector::humanize($this->_first_name()))));
+		return $this->_first_item()->label($this->options('label', $label));
 	}
 
 	/**
@@ -41,36 +61,16 @@ class Form_Widget
 	 */
 	public function render()
 	{
-		$this->slot(":name", $this->_first_name(), FALSE);
-		$this->slot(":label", $this->label(), FALSE);
+		$this->slots(":name", $this->name(), FALSE);
+		$this->slots(":label", $this->label(), FALSE);
 
-		return strtr($this->template, $this->slots);
+		return strtr($this->_template, $this->_slots);
 	}
 
-	/**
-	 * Sets the attributes of the object 
-	 * @param array|string $values the name of the object or an array of name => value
-	 * @param mixed $value 
-	 * @return Form_Widget $this
-	 */
-	public function set($values, $value = null)
-	{
-		if ( ! is_array($values))
-		{
-			$values = array($values => $value);
-		}
-
-		foreach( $values as $name => $value )
-		{
-			$this->$name = $value;
-		}
-
-		return $this;
-	}
 
 	public function __toString()
 	{
-		return Arr::get($this->slots, ':field');
+		return Arr::get($this->_slots, ':field');
 	}
 
 
@@ -81,16 +81,16 @@ class Form_Widget
 	 * @param bool $overwrite Wheter to overwrite existing slots if they exist
 	 * @return $this
 	 */
-	public function slot($name, $value = null, $overwrite = TRUE)
+	public function slots($name, $value = null, $overwrite = TRUE)
 	{
 		if( $value === null)
 		{
-			return Arr::get($this->slots, $name);
+			return Arr::get($this->_slots, $name);
 		}
 
-		if( $overwrite OR ! isset($this->slots[$name]))
+		if( $overwrite OR ! isset($this->_slots[$name]))
 		{
-			$this->slots[$name] = $value;	
+			$this->_slots[$name] = $value;	
 		}
 		
 		return $this;
@@ -125,96 +125,16 @@ class Form_Widget
 	{
 		$callback = self::_real_callback($callback);
 
-		$this->slot(':type', Arr::get($callback, 1));
+		$this->slots(':type', Arr::get($callback, 1));
 
 		if( $field = call_user_func($callback, $this) )
 		{
-			$this->slot(":field", $field);
+			$this->slots(":field", $field);
 		}
 		return $this;
 	}
 
-	/**
-	 * Return a name with prefixed with this widget's prefix
-	 * so 'email' will become parent_form[email] in child forms
-	 * @param string $name 
-	 * @return string
-	 */
-	public function prefixed_name($name)
-	{
-		return sprintf($this->prefix, $name);
-	}
-
-	/**
-	 * Return the prefixed name of the widget, if the name is an array, return an array of prefixed names
-	 * If a name is given return this prefixed name from the array of names
-	 * @param string $name 
-	 * @return string|array
-	 */
-	public function name( $name = null )
-	{
-		if( $name !== null AND is_array($this->name))
-		{
-			return $this->prefixed_name( Arr::get($this->name, $name));
-		}
-		elseif(is_array($this->name))
-		{
-			return isset($this->name[$name]) ? array_map(array($this, 'prefixed_name'), $this->name) : null;
-		}
-		else
-		{
-			return $this->prefixed_name($this->name);
-		}
-	}
-
-	/**
-	 * Return an id with prefixed with this widget's prefix
-	 * so 'email' will become parent_form_email in child forms
-	 * @param string $name 
-	 * @return string
-	 */
-	public function prefixed_id($name)
-	{
-		return str_replace("]", "", str_replace("[", "_", $this->prefixed_name($name)));
-	}
-
-	/**
-	 * Return the prefixed id of the widget, if the name is an array, return an array of prefixed ids
-	 * If a name is given return this prefixed name from the array of ids
-	 * @param string $name 
-	 * @return string|array
-	 */
-	public function id( $name = null )
-	{
-		if( $name !== null AND is_array($this->name) )
-		{
-			return isset($this->name[$name]) ? $this->prefixed_id( Arr::get($this->name, $name)) : null;
-		}
-		elseif(is_array($this->name))
-		{
-			return array_map(array($this, 'prefixed_id'), $this->name);
-		}
-		else
-		{
-			return $this->prefixed_id($this->name);
-		}
-	}
-
-	/**
-	 * Return the value, if the name is an array, return an array of prefixed values
-	 * If a name is given return this name's value
-	 * @param string $name 
-	 * @return string|array
-	 */
-	public function value($name = null)
-	{
-		if($name !== null)
-		{
-			return Arr::get((array) $this->value, $name);
-		}
-		return $this->value;
-	}	
-
+	
 	/**
 	 * Set required options
 	 * @return $this
@@ -228,12 +148,95 @@ class Form_Widget
 
 		$required = Arr::flatten(func_get_args());
 
-		if( $missing_keys = array_diff($required, array_keys($this->options)))
+		if( $missing_keys = array_diff($required, array_keys($this->_options)))
 		{
-			throw new Kohana_Exception("Missing required options :missing for widget :name", array(":missing" => join(", ", $missing_keys), ':name' => $this->name));
+			throw new Kohana_Exception("Missing required options :missing for widget :name", array(":missing" => join(", ", $missing_keys), ':name' => $this->field_name()));
 		}
 
 		return $this;		
 	}
+
+	public function child_prefix()
+	{
+		return call_user_func_array('Form_Builder::generate_prefix', array_merge(array($this->_prefix, $this->field_name()), func_get_args()));
+	}
+
+	public function prefix($prefix = null)
+	{
+		if( $prefix !== null)
+		{
+			$this->_prefix = (string) $prefix;
+			foreach($this->_items as $item)
+			{
+				$item->prefix($this->_prefix)	;
+			}
+			$this->_attributes['id'] = $this->id();
+
+			return $this;
+		}
+		return $this->_prefix;
+	}
+
+	public function template($template = null)
+	{
+		if( $template !== null)
+		{
+			$this->_template = (string) $template;
+
+			return $this;
+		}
+		return $this->_template;
+	}	
+
+	public function options($name = null, $default = null)
+	{
+		if( is_array($name))
+		{
+			$this->_options = Arr::merge($this->_options, $name);
+			return $this;
+		}
+		if( $name !== null)
+		{
+			return Arr::get($this->_options, $name, $default);
+		}
+
+		return $this->_options;
+	}
+
+	public function attributes($name = null, $default = null)
+	{
+		if( is_array($name))
+		{
+			$this->_attributes->merge($name);
+			return $this;
+		}
+		if( $name !== null)
+		{
+			return Arr::get($this->_attributes, $name, $default);
+		}
+
+		return $this->_attributes;
+	}
+
+	public function items($name = null)
+	{
+		if( is_array($name))
+		{
+			foreach($name as $item_name => $item_value)
+			{
+				$this->_items[$item_name] = new Form_Widget_Item($item_name, $item_value, $this->_prefix);
+			}
+			return $this;
+		}
+
+		if( $name !== null)
+		{
+			return Arr::get($this->_items, $name);
+		}
+
+		return $this->_attributes;
+	}		
+
+
 
 }

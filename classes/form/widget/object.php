@@ -8,34 +8,63 @@
  */
 class Form_Widget_Object extends Form_Widget
 {
-	public $template = '<div class="row :type-field :name-row :with-errors">:label:field:errors</div>';
-	public $object;
-	public $errors;
-
-	public function __construct($name, $object)
-	{
-		$this->object = $object;
-		parent::__construct($name);
-	}
+	protected $_template = '<div class="row :type-field :name-row :with-errors">:label:field:errors</div>';
+	protected $_object;
+	
 
 	public function render()
 	{
-		$this->slot(":errors", $this->errors());
-		$this->slot(":with-errors", $this->errors() ? 'with-errors' : '');
+		$errors = array();
+		foreach($this->_items as $item)
+		{
+			$errors = $item->errors();
+		}
+
+		$this->slots(":errors", "<span class=\"field-errors\">{$errors}</span>");
+		$this->slots(":with-errors", $this->errors() ? 'with-errors' : '');
 
 		return parent::render();
 	}
 
-	public function errors()
+	public function template($template = null)
 	{
-		$errors = array_filter((array) $this->errors);
-		if( ! $errors )
+		if( $template !== null)
 		{
-			return '';
-		}
-		
-		$errors = join(", ", Arr::flatten($errors));
+			$this->_template = (string) $template;
 
-		return "<span class=\"field-errors\">{$errors}</span>";
+			return $this;
+		}
+		return $this->_template;
+	}	
+
+	public function object($object = null)
+	{
+		if( $object !== null)
+		{
+			$this->_object = $object;
+
+			return $this;
+		}
+		return $this->_object;
+	}		
+
+	public function errors($errors = null)
+	{
+		if( is_array($errors))
+		{
+			foreach($errors as $item_name => $errors)
+			{
+				$this->_items[$item_name]->errors($errors);
+			}
+			return $this;
+		}
+
+		if( $errors !== null)
+		{
+			$this->_first_item()->errors($errors);
+			return $this;
+		}
+
+		return $this->_first_item()->errors();
 	}	
 }

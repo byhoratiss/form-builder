@@ -15,6 +15,15 @@ class Form_Widget_Attributes implements ArrayAccess, Iterator, Countable
 		$this->container = (array) $container;
 	}
 
+	public function merge_as_data($options)
+	{
+		foreach((array) $options as $option_name => $option)
+		{
+			$this->container['data-'.$option_name] = $option;
+		}
+		return $this;
+	}
+
 	public function merge($container)
 	{
 		$this->container = Arr::merge($this->container, $container);
