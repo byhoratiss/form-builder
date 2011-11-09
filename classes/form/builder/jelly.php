@@ -16,7 +16,7 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 
 		if( ! is_array($name) AND $field = $this->_object->meta()->field($name))
 		{
-			$widget->attributes(self::html5_rules($field->rules));
+			$widget->attributes->merge(self::html5_rules($field->rules));
 		}
 		return $widget;
 	}	

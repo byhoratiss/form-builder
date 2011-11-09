@@ -42,55 +42,55 @@ class Form_Widgets
 			$choices = arr::merge( array("" => ($blank === TRUE) ? " -- Select -- " : $blank), $choices );
 		}
 
-		return Form::select($data->name(), $choices, $data->value(), $data->attributes());
+		return Form::select($data->name(), $choices, $data->value(), $data->attributes->as_array());
 	}
 
 	static public function date(Form_Widget $data)
 	{
-		$data->attributes(array('type' => 'date', 'data-type' => 'date'));
+		$data->attributes->merge(array('type' => 'date', 'data-type' => 'date'));
 
-		return Form::input($data->name(), $data->value(), $data->attributes());
+		return Form::input($data->name(), $data->value(), $data->attributes->as_array());
 	}	
 
 	static public function datetime(Form_Widget $data)
 	{
-		$data->attributes(array('type' => 'date', 'data-type' => 'datetime'));
+		$data->attributes->merge(array('type' => 'date', 'data-type' => 'datetime'));
 
-		return Form::input($data->name(), $data->value(), $data->attributes());
+		return Form::input($data->name(), $data->value(), $data->attributes->as_array());
 	}		
 
 	static public function input(Form_Widget $data)
 	{
-		return Form::input($data->name(), $data->value(), $data->attributes());
+		return Form::input($data->name(), $data->value(), $data->attributes->as_array());
 	}
 
 	static public function hidden(Form_Widget $data)
 	{
-		return Form::hidden($data->name(), $data->value(), $data->attributes());
+		return Form::hidden($data->name(), $data->value(), $data->attributes->as_array());
 	}
 
 	static public function password(Form_Widget $data)
 	{
-		return Form::password($data->name(), $data->value(), $data->attributes());
+		return Form::password($data->name(), $data->value(), $data->attributes->as_array());
 	}			
 
 	static public function textarea(Form_Widget $data)
 	{
-		return Form::textarea($data->name(), $data->value(), $data->attributes());
+		return Form::textarea($data->name(), $data->value(), $data->attributes->as_array());
 	}
 
 	static public function checkbox(Form_Widget $data)
 	{
 		return 
 			Form::hidden($data->name(), null).
-			Form::checkbox($data->name(), 1, (bool) $data->value(), $data->attributes());
+			Form::checkbox($data->name(), 1, (bool) $data->value(), $data->attributes->as_array());
 	}
 
 	static public function radio(Form_Widget $data)
 	{
 		return 
 			Form::hidden($data->name(), null).
-			Form::radio($data->name(), 1, (bool) $data->value(), $data->attributes());
+			Form::radio($data->name(), 1, (bool) $data->value(), $data->attributes->as_array());
 	}	
 
 	static public function image(Form_Widget $data)
@@ -99,7 +99,7 @@ class Form_Widgets
 
 		return strtr('<div class="image-field">:image :input</div>', array(
 			":image" => $data->value() ? HTML::image($data->options('path').$data->value()) : '<div class="image-placeholder"></div>', 
-			":input" => Form::file($data->name(), $data->value(), $data->attributes())
+			":input" => Form::file($data->name(), $data->value(), $data->attributes->as_array())
 		));
 	}
 
@@ -116,7 +116,7 @@ class Form_Widgets
 				Form::label($data->id().'_'.$key, $title).
 			'</li>';
 		}
-		return "<ul ".HTML::attributes($data->attributes()).">$html</ul>";
+		return "<ul ".HTML::attributes($data->attributes->as_array()).">$html</ul>";
 	}
 
 
@@ -139,6 +139,6 @@ class Form_Widgets
 				Form::label($data->id().'_'.$key, $title).
 			'</li>';
 		}
-		return "<ul ".HTML::attributes($data->attributes()).">$html</ul>";		
+		return "<ul ".HTML::attributes($data->attributes->as_array()).">$html</ul>";		
 	}
 }

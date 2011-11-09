@@ -116,13 +116,14 @@ class Form_Builder
 
 	public function field($callback, $name, $options = null, $attributes = null )
 	{
-		return $this
+		$widget = $this
 			->widget($name)
 			->set(array(
 				'options' => (array) $options,
-				'attributes' => (array) $attributes
-			))
-			->field_callback($this->widget_callback($callback));
+			));
+		$widget->attributes->merge((array) $attributes);
+		return $widget->field_callback($this->widget_callback($callback));
+		
 	}	
 
 	public function value($name)

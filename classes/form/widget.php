@@ -9,7 +9,7 @@
 class Form_Widget
 {
 	public $template = '<div class="row :type-field :name-row">:label:field</div>';
-	public $attributes = array();
+	public $attributes = null;
 	public $slots = array(
 		':type' => 'generic',
 		':field' => '',
@@ -22,7 +22,7 @@ class Form_Widget
 	function __construct( $name )
 	{
 		$this->name = $name;
-		$this->attributes(array('id' => $this->id()));
+		$this->attributes = new Form_Widget_Attributes(array('id' => $this->id()));
 	}
 
 	protected function _first_name()
@@ -35,6 +35,10 @@ class Form_Widget
 		return Form::label( $this->id(), Arr::get($this->options, 'label', $label ? $label : ucfirst(Inflector::humanize($this->_first_name()))));
 	}
 
+	/**
+	 * Render the widget filling the slots in the template
+	 * @return string
+	 */
 	public function render()
 	{
 		$this->slot(":name", $this->_first_name(), FALSE);
@@ -43,6 +47,12 @@ class Form_Widget
 		return strtr($this->template, $this->slots);
 	}
 
+	/**
+	 * Sets the attributes of the object 
+	 * @param array|string $values the name of the object or an array of name => value
+	 * @param mixed $value 
+	 * @return Form_Widget $this
+	 */
 	public function set($values, $value = null)
 	{
 		if ( ! is_array($values))
@@ -63,6 +73,14 @@ class Form_Widget
 		return Arr::get($this->slots, ':field');
 	}
 
+
+	/**
+	 * Set the contents of a slot for the template
+	 * @param string $name The name of the slot
+	 * @param string $value the content of the slot
+	 * @param bool $overwrite Wheter to overwrite existing slots if they exist
+	 * @return $this
+	 */
 	public function slot($name, $value = null, $overwrite = TRUE)
 	{
 		if( $value === null)
@@ -148,12 +166,6 @@ class Form_Widget
 			return $this->options;
 		}
 
-		if( is_array( $name ) )
-		{
-			$this->options = Arr::merge($this->options, $name);
-			return $this;
-		}
-
 		return Arr::get($this->options, $name, $default);
 	}
 
@@ -164,12 +176,6 @@ class Form_Widget
 			return $this->attributes;
 		}
 		
-		if( is_array( $name ) )
-		{
-			$this->attributes = Arr::merge($this->attributes, $name);
-			return $this;
-		}
-
 		return Arr::get($this->attributes, $name, $default);
 	}
 
