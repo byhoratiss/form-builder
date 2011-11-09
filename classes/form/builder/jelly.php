@@ -73,7 +73,7 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 			$this->_html5_validation = (bool) $validate;
 			return $this;
 		}
-		return $this->_prefix;		
+		return $this->_html5_validation;		
 	}
 
 	public function check($save = FALSE, $extra_validation = null)
