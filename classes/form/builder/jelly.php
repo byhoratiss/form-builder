@@ -9,12 +9,13 @@
 class Form_Builder_Jelly extends Form_Builder_Validation
 {
 	protected $_original_data = array();
+	protected $_html5_validation = true;
 
 	public function widget($name)
 	{
 		$widget = parent::widget($name);
 
-		if( ! is_array($name) AND $field = $this->_object->meta()->field($name))
+		if( $this->_html5_validation AND ! is_array($name) AND $field = $this->_object->meta()->field($name))
 		{
 			$widget->attributes->merge(self::html5_rules($field->rules));
 		}
@@ -63,6 +64,16 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 	{
 		$this->_object->save();
 		return $this;
+	}
+
+	public function html5_validation($validate = null)
+	{
+		if( $validate !== null)
+		{
+			$this->_html5_validation = (bool) $validate;
+			return $this;
+		}
+		return $this->_prefix;		
 	}
 
 	public function check($save = FALSE, $extra_validation = null)
