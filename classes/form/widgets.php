@@ -23,14 +23,6 @@ class Form_Widgets
 		return $choices;
 	}
 
-	static public function _swap_strings($s1, $s2, $string)
-	{
-		$string = str_replace($s1, ':$s1$:', $string);
-		$string = str_replace($s2, $s1, $string);
-		return str_replace(':$s1$:', $s2, $string);
-	}
-
-
 	static public function select(Form_Widget $data)
 	{
 		$choices = self::_list_choices($data->required('choices')->options('choices'));
@@ -61,6 +53,11 @@ class Form_Widgets
 	{
 		return Form::input($data->name(), $data->value(), $data->attributes()->as_array());
 	}
+
+	static public function file(Form_Widget $data)
+	{
+		return Form::file($data->name(), $data->attributes()->as_array());
+	}	
 
 	static public function hidden(Form_Widget $data)
 	{
@@ -110,7 +107,7 @@ class Form_Widgets
 		foreach(self::_list_choices($data->options('choices')) as $key => $title)
 		{
 			$html .= '<li>'.
-				Form::checkbox($data->name()."[]", $key, $key == $value, array("id" => $data->id().'_'.$key)).
+				Form::checkbox($data->name()."[]", $key, $key == $data->value(), array("id" => $data->id().'_'.$key)).
 				Form::label($data->id().'_'.$key, $title).
 			'</li>';
 		}

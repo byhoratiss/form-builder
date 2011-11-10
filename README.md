@@ -67,6 +67,7 @@ Available widgets are:
 * __datetime__ same as date, you can use javascript to add special widgets
 * __input__ an ``input`` tag
 * __hidden__ an `input` tag type hidden
+* __file__ an `input` tag type file
 * __password__ an `input` tag type password
 * __textarea__ a ``textarea`` tag
 * __checkbox__ a ``input`` tag type checkbox with a hidden tag with the same name before it so you will resieve null value in the $_POST when not checked
@@ -88,7 +89,122 @@ $form->prefix("nested_form[child_form][%s]");
 ```
 This will move all the widget names / ids in the proper namespace
 
-Form Builder
+Form Widgets
 ------------
+You can write your own widgets. Each widget is a static method of a class Form_Widgets_{your_name}. You access those widgets with ``$form->row("{your_name}::{widget_name});
+
+A typical widget looks like this:
+
+``` php
+<?php
+class Form_Widgets_Custom
+{
+	static public function richtextarea(Form_Widget $data)
+	{
+		$this->atrributes(array('data-type' => 'rich'));
+
+		return Form::textarea($this->name(), $data->value(), $this->atrributes()->as_array());
+	} 
+?>
+```
+
+``` php
+//In the view you'll call the widget like this
+$form->row('custom::richtextarea', 'myfield');
+```
+$data is an instance of Form_Widget (or Form_Widget_Object if its jelly or validation) that you can manipulate. What you return will be placed inside :field slot, but you can do this directly from the widget fill different slots and whatever.
+
+You can work with multiple fields for a widget using the ->items() array
+
+``` php
+<?php
+class Form_Widgets_Custom
+{
+	static public function richtextarea(Form_Widget $data)
+	{
+		$this->atrributes(array('data-type' => 'rich'));
+
+		return 
+			"<div ".$this->attributes.">".
+				Form::input($this->items('field1')->name(), $data->items('field2')->value()).
+				Form::input($this->items('field2')->name(), $data->items('field2')->value()).
+			"</div>";
+	} 
+?>
+```
+
+``` php
+//In the view you'll call the widget like this
+$form->row('custom::multifield', array('field1', 'field2'));
+```
+``$data->name()``, ``$data->value()``, ``$data->id()``, ``$data->field_value()``, ``$data->errors()`` still work, but will return the first field in ``->items()`` array
+
+
+Here's an example of a very complex widget impelemnting manytomany / hasmany / belongsto jelly association with jquery autocompelete
+
+```php
+<?
+	//Helper method to render an item from the outcompelte
+	static public function list_item($item, $name)
+	{
+		return Admin::content_tag("li", array(), 
+			'<span class="ui-button ui-icon ui-icon-close"></span>'.
+			"<strong>".$item->name()."</strong>".
+			Form::hidden($name, $item->id())
+		);
+	}
+
+	static public function autocomplete(Form_Widget $data)
+	{
+		//If options does not have a model, throw an exception
+		$data->required("model");
+
+		//Add those to the html attributes 
+		$data->attributes( array(
+			'data-model' => $data->options('model'),
+			'data-type' => 'autocomplete',
+			'data-name' => $data->name(),
+		));
+
+		$value_html = '';
+
+		//Different implementation based on the multiple option
+		if($data->options('multiple'))
+		{
+			$data->attributes( array(
+				'data-multiple' => 'true',
+				'data-name' => $data->name().'[]',
+			));
+
+			if($value = $data->value() AND $value instanceof Jelly_Collection)
+			{
+				foreach($value as $item)
+				{
+					$value_html .= self::list_item($item, $data->attributes('data-name'));
+				}
+			}					
+		}
+		else
+		{
+			if($value = $data->value() AND $value instanceof Jelly_Model AND $value->loaded())
+			{
+				$value_html = self::list_item($value, $data->attributes('data-name'));
+
+				//This will add a "selected" class, not disturbing other classes that you might pass from the view
+				$data->attributes()->add_class('selected');
+			}
+		}
+
+		return 
+			//This hidden is needed to reset the association to no elements when there are no items 
+			Form::hidden($data->name(), '').
+			"<ul class=\"list-values\">$value_html</ul>".
+			Form::input($data->name().'_input', null, $data->attributes()->as_array());
+	}
+?>
+```
+
+
+
 
 

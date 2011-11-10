@@ -27,17 +27,6 @@ class Form_Widget_Object extends Form_Widget
 		return parent::render();
 	}
 
-	public function template($template = null)
-	{
-		if( $template !== null)
-		{
-			$this->_template = (string) $template;
-
-			return $this;
-		}
-		return $this->_template;
-	}	
-
 	public function object($object = null)
 	{
 		if( $object !== null)
@@ -51,7 +40,7 @@ class Form_Widget_Object extends Form_Widget
 
 	public function errors($errors = null)
 	{
-		if( is_array($errors))
+		if( is_array($errors) AND Arr::is_assoc($errors))
 		{
 			foreach($errors as $item_name => $errors)
 			{
@@ -62,10 +51,10 @@ class Form_Widget_Object extends Form_Widget
 
 		if( $errors !== null)
 		{
-			$this->_first_item()->errors($errors);
+			$this->first_item()->errors($errors);
 			return $this;
 		}
 
-		return $this->_first_item()->errors();
+		return $this->first_item()->errors();
 	}	
 }

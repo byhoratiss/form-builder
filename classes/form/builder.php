@@ -11,10 +11,6 @@ class Form_Builder
 	protected $_data = null;
 	protected $_prefix = '%s';
 
-	protected $widget_helpers = array();
-	protected $widgets = array();
-
-
 	/**
 	 * Return a ready Form_Builder object, based on the type of the argument
 	 * * Array - Form_Builder
@@ -45,6 +41,11 @@ class Form_Builder
 		$this->data($data);
 	}
 
+	/**
+	 * Generate a new Widget form the name
+	 * @param string|array $name the name or array of names for the widget
+	 * @return Form_Widget
+	 */
 	public function widget($name)
 	{
 		$widget = new Form_Widget(Arr::extract($this->_data, (array) $name));
@@ -53,11 +54,29 @@ class Form_Builder
 
 	}
 
+	/**
+	 * Generate an html row with a widget using the template
+	 * 
+	 * @param string $callback "input", "select", "textarea" or custom one "admin::checkboxes"
+	 * @param string|array $name the name or array of names for the widget
+	 * @param array $options 
+	 * @param array $attributes 
+	 * @return string
+	 */
 	public function row($callback, $name, $options = null, $attributes = null )
 	{
 		return $this->field($callback, $name, $options, $attributes)->render();
 	}
 
+	/**
+	 * Return only the field with the widget
+	 * 
+	 * @param string $callback "input", "select", "textarea" or custom one "admin::checkboxes"
+	 * @param string|array $name the name or array of names for the widget
+	 * @param array $options 
+	 * @param array $attributes 
+	 * @return string
+	 */
 	public function field($callback, $name, $options = null, $attributes = null )
 	{
 		return $this
@@ -67,32 +86,21 @@ class Form_Builder
 			->field_callback($callback);
 	}	
 
+	/**
+	 * Get the value of a data inside the form
+	 * @param string $name 
+	 * @return mixed
+	 */
 	public function value($name)
 	{
 		return Arr::get($this->_data, $name);
 	}
 
-	public function renderer($renderer = null)
-	{
-		if( $renderer !== null)
-		{
-			$this->_renderer = $renderer;
-			return $this;
-		}
-
-		if(is_string($this->_renderer))
-		{
-			$this->_renderer = new $this->_renderer($this);
-
-			if( ! ($this->_renderer instanceof Form_Renderer)) 
-				throw new Kohana_Exception(":renderer must be a subclass of Form_render", array(":renderer" => get_class($this->_renderer)));
-
-			$this->_renderer->prefix($this->_prefix);
-		}
-
-		return $this->_renderer;
-	}		
-
+	/**
+	 * Get / Set the prefix for this form
+	 * @param string $prefix 
+	 * @return string|$this
+	 */
 	public function prefix($prefix = null)
 	{
 		if( $prefix !== null)
@@ -103,6 +111,11 @@ class Form_Builder
 		return $this->_prefix;
 	}
 
+	/**
+	 * Get / Set the data for this form
+	 * @param string $data 
+	 * @return string|$this
+	 */
 	public function data($data = null)
 	{
 		if( $data !== null)
@@ -113,7 +126,12 @@ class Form_Builder
 		return $this->_data;
 	}
 
-	
+	/**
+	 * Helper method to build a prefix based, arbitrary number of fields deep ( after the $name argument )
+	 * @param string $prefix 
+	 * @param string $name 
+	 * @return string
+	 */
 	static public function generate_prefix($prefix, $name)
 	{
 		$additional = array_slice(func_get_args(), 2);

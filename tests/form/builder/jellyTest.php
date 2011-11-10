@@ -5,7 +5,8 @@
  *
  * @package Form_Builder
  */
-class Form_Jelly_BuilderTest extends Kohana_Unittest_TestCase {
+class Form_Builder_JellyTest extends Kohana_Unittest_TestCase {
+
 
 	public function test_getters()
 	{
@@ -58,6 +59,5 @@ class Form_Jelly_BuilderTest extends Kohana_Unittest_TestCase {
 		$this->assertNull($form->errors());
 
 	}
-
 
 }

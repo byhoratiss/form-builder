@@ -37,7 +37,7 @@ class Form_Widget_Attributes implements ArrayAccess, Iterator, Countable
 	 */
 	public function add_class($class_name)
 	{
-		$this->container['class'] = join(' ', array_unique(array_merge(explode(' ', Arr::get($this->container, 'class', '')), (array) $class_name)));
+		$this->container['class'] = join(' ', array_unique(array_filter(array_merge(explode(' ', Arr::get($this->container, 'class', '')), (array) $class_name))));
 
 		return $this;
 	}
@@ -49,7 +49,7 @@ class Form_Widget_Attributes implements ArrayAccess, Iterator, Countable
 	 */
 	public function remove_class($class_name)
 	{
-		$this->container['class'] = join(' ', array_unique(array_diff(explode(' ', Arr::get($this->container, 'class', '')), (array) $class_name)));
+		$this->container['class'] = join(' ', array_unique(array_filter(array_diff(explode(' ', Arr::get($this->container, 'class', '')), (array) $class_name))));
 
 		return $this;
 	}

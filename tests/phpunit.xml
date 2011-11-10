@@ -1,4 +1,4 @@
-<phpunit colors="true" bootstrap="../../unittest/bootstrap_with_test_classes.php"> 
+<phpunit colors="true" bootstrap="../../unittest-extensions/bootstrap_with_test_classes.php"> 
     <testsuites> 
         <testsuite name="form"> 
             <directory>./form</directory> 

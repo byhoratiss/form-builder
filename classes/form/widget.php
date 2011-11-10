@@ -24,35 +24,56 @@ class Form_Widget
 		$this->_attributes = new Form_Widget_Attributes(array('id' => $this->id()));
 	}
 
-	protected function _first_item()
+	public function first_item()
 	{
 		reset($this->_items);
 		return current($this->_items);
 	}
 
+	/**
+	 * The field name of the first item
+	 * @return string
+	 */
 	public function field_name()
 	{
-		return $this->_first_item()->name();
+		return $this->first_item()->field_name();
 	}
 
+	/**
+	 * The name of the first item
+	 * @return string
+	 */
 	public function name()
 	{
-		return $this->_first_item()->name();
+		return $this->first_item()->name();
 	}
 
+	/**
+	 * The id of the first item
+	 * @return string
+	 */
 	public function id()
 	{
-		return $this->_first_item()->id();
+		return $this->first_item()->id();
 	}
 
+	/**
+	 * The value of the first item
+	 * @return string
+	 */
 	public function value()
 	{
-		return $this->_first_item()->value();
+		return $this->first_item()->value();
 	}
 
+	/**
+	 * A label tag for the first item
+	 * @param string $label Optional label if not set will humanize the item name
+	 * @return string
+	 */
 	public function label($label = null)
 	{
-		return $this->_first_item()->label($this->options('label', $label));
+		return $this->first_item()->label($this->options('label', $label));
 	}
 
 	/**
@@ -95,6 +116,20 @@ class Form_Widget
 		
 		return $this;
 	}
+
+	/**
+	 * Swap two slots in the template. Useful for swapping :label and :field for example
+	 * @param string $first_slot 
+	 * @param string $second_slot 
+	 * @return $this
+	 */
+	public function swap_slots($first_slot, $second_slot)
+	{
+		$string = str_replace($first_slot, ':$first_slot$:', $this->_template);
+		$string = str_replace($second_slot, $first_slot, $string);
+		$this->_template = str_replace(':$first_slot$:', $second_slot, $string);
+		return $this;
+	}		
 
 	/**
 	 * Return the real callback funciton, prepending Form_Widget if non is given
@@ -156,11 +191,20 @@ class Form_Widget
 		return $this;		
 	}
 
+	/**
+	 * Return the prefix for a form that will be a "child" of this widget
+	 * @return string
+	 */
 	public function child_prefix()
 	{
 		return call_user_func_array('Form_Builder::generate_prefix', array_merge(array($this->_prefix, $this->field_name()), func_get_args()));
 	}
 
+	/**
+	 * Get / Set prefix for this widget
+	 * @param string $prefix 
+	 * @return string|$this
+	 */
 	public function prefix($prefix = null)
 	{
 		if( $prefix !== null)
@@ -177,6 +221,11 @@ class Form_Widget
 		return $this->_prefix;
 	}
 
+	/**
+	 * Get / Set template for this widget
+	 * @param string $template 
+	 * @return string|$this
+	 */
 	public function template($template = null)
 	{
 		if( $template !== null)
@@ -188,6 +237,14 @@ class Form_Widget
 		return $this->_template;
 	}	
 
+
+	/**
+	 * Get / Set options, with a second argument as the default. If you set the first argument an array will merge it with the current options
+	 * 
+	 * @param string|array $name the name of the option to return, if not supplied returns all the options
+	 * @param mixed $default return this if the option is not present or null
+	 * @return mixed
+	 */
 	public function options($name = null, $default = null)
 	{
 		if( is_array($name))
@@ -203,6 +260,13 @@ class Form_Widget
 		return $this->_options;
 	}
 
+	/**
+	 * Get / Set attributes, with a second argument as the default. If you set the first argument an array will merge it with the current attributes
+	 * 
+	 * @param string|array $name the name of the option to return, if not supplied returns all the options
+	 * @param mixed $default return this if the attribute is not present or null
+	 * @return mixed
+	 */
 	public function attributes($name = null, $default = null)
 	{
 		if( is_array($name))
@@ -218,6 +282,13 @@ class Form_Widget
 		return $this->_attributes;
 	}
 
+
+	/**
+	 * Get / Set items. If you set the first argument an array will merge it with the current items. The array must be 'name' => 'value'
+	 * 
+	 * @param string|array $name the name of the item to return, if not supplied returns all the items
+	 * @return mixed
+	 */
 	public function items($name = null)
 	{
 		if( is_array($name))
@@ -234,9 +305,6 @@ class Form_Widget
 			return Arr::get($this->_items, $name);
 		}
 
-		return $this->_attributes;
+		return $this->_items;
 	}		
-
-
-
 }

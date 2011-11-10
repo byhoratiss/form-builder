@@ -14,7 +14,7 @@ class Model_Test_Entry extends Jelly_Model {
 			'id'         => Jelly::field('primary'),
 			'name'       => Jelly::field('string'),
 			'password'   => Jelly::field('password'),
-			'email'      => Jelly::field('email'),
+			'email'      => Jelly::field('email', array('rules' => array(array('not_empty'), array('valid::email')))),
 		 ));
 	}
 
