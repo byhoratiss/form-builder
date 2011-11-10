@@ -18,6 +18,7 @@ In the controller
 ?>
 ```
 In the view
+
 ``` php
 	//in View
 	<?php echo Form::open(); ?>
@@ -35,6 +36,7 @@ In Your Controller
 ------------------
 
 You create forms based on Arrays, Validation objects of Jelly Models.
+
 ``` php
 <?php
 $array_form = Form_Builder::factory($_POST);
@@ -42,6 +44,7 @@ $validation_form = Form_Builder::factory(Validation::factory($_POST)->rules( /* 
 $jelly_form = Form_Builder::factory(Jelly::factory('book', 10));
 ?>
 ```
+
 Validation and Jelly forms have a ``$form->check()`` method to see if it passes validation, after that you can access the errors with ``$form->errors()``. Jelly forms have ``$form->save()``. You can get access to the object of the form with ``$form->object()``;
 
 In Your View
@@ -49,6 +52,7 @@ In Your View
 
 A row is a html snipped with the input field itself along with a label, errors and some css classes.
 Some examples:
+
 ``` php
 $form->row("input", "username");
 $form->row("input", "username", array("label" => "User Name"));
@@ -56,6 +60,7 @@ $form->row("select", "accept", array("choices" => array("yes", "no"));
 ```
 
 to render only the field itslef - use the ``field`` method
+
 ``` php
 $form->field("select", "accept", array("choices" => array("yes", "no"));
 ```
@@ -80,6 +85,7 @@ Nested Forms
 ------------
 
 You can achieve nested forms by defining a prefix
+
 ``` php
 <?php
 $form->prefix("nested_form[%s]");
@@ -87,6 +93,7 @@ $form->prefix("nested_form[%s]");
 $form->prefix("nested_form[child_form][%s]");
 ?>
 ```
+
 This will move all the widget names / ids in the proper namespace
 
 Form Widgets
@@ -137,6 +144,7 @@ class Form_Widgets_Custom
 //In the view you'll call the widget like this
 $form->row('custom::multifield', array('field1', 'field2'));
 ```
+
 ``$data->name()``, ``$data->value()``, ``$data->id()``, ``$data->field_value()``, ``$data->errors()`` still work, but will return the first field in ``->items()`` array
 
 
