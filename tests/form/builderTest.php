@@ -49,7 +49,9 @@ class Form_BuilderTest extends Kohana_Unittest_TestCase {
 	{
 		return array(
 			array('input', 'input[type=text][name=test][value=default]'),
-			array('password', 'input[type=password][name=test][value=default]'),
+			array('password', 'input[type=password][name=test][value=]'),
+			array('password', 'input[type=password][name=test][value=default]', array('value' => true)),
+			array('password', 'input[type=password][name=test][value=default1]', array('value' => 'default1')),
 			array('file', 'input[type=file][name=test]'),
 			array('date', 'input[type=date][name=test][value=default]'),
 			array('checkbox', 'input[type=checkbox][name=test][value=1]'),

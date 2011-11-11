@@ -33,6 +33,10 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 					$validation['required'] = '';
 					break;
 
+				case 'url':
+					$validation['url'] = '';
+					break;
+
 				case 'range':
 					$validation['min'] = $rule[1][1];
 					$validation['max'] = $rule[1][2];

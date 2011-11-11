@@ -66,7 +66,12 @@ class Form_Widgets
 
 	static public function password(Form_Widget $data)
 	{
-		return Form::password($data->name(), $data->value(), $data->attributes()->as_array());
+		$value = null;
+		if( $data->options('value') )
+		{
+			$value = is_string($data->options('value')) ? $data->options('value') : $data->value();
+		}
+		return Form::password($data->name(), $value, $data->attributes()->as_array());
 	}			
 
 	static public function textarea(Form_Widget $data)
