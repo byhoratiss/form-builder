@@ -61,7 +61,8 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 	function __construct(Jelly_Model $object, $data = null)
 	{
 		$this->object($object);
-		$this->data(Arr::merge($object->as_array(), (array) $data));
+
+		$this->data((array) $data);	
 	}
 
 	public function save()

@@ -11,10 +11,16 @@ class Form_Builder_Validation extends Form_Builder
 	protected $_object = null;
 	protected $_error_file = null;
 	protected $_errors = null;
+	protected $_ignored = array();
 
 	public function widget($name)
 	{
-		$widget = new Form_Widget_Object(Arr::extract($this->_data, (array) $name));
+		$data = array();
+		foreach((array) $name as $field_name)
+		{
+			$data[$field_name] = $this->value($field_name);
+		}
+		$widget = new Form_Widget_Object($data);
 		$widget->errors($this->errors($name));
 		
 		return $widget
@@ -40,7 +46,32 @@ class Form_Builder_Validation extends Form_Builder
 			$this->_errors = $this->_object->errors($this->_error_file);
 			return false;
 		}
-	}	
+	}
+
+	public function ignored()
+	{
+		if(func_num_args() == 0)
+		{
+			return $this->_ignored;
+		}
+
+		$this->_ignored = Arr::flatten(func_get_args());
+
+		return $this;		
+	}
+
+	public function value($name)
+	{
+		return Arr::get($this->_data, $name, $this->object_value($name) );
+	}
+
+	public function object_value($name)
+	{
+		if( ! in_array($name, $this->_ignored) AND isset($this->_object->$name))
+			return $this->_object->$name;
+		else
+			return null;
+	}
 
 	public function errors($name = null)
 	{
