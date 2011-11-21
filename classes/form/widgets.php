@@ -11,16 +11,30 @@ class Form_Widgets
 {
 	static public function _list_choices($choices)
 	{
-		if($choices instanceof Jelly_Collection)
-		{
-			$choices = $choices->select_all();
-		}		
-
 		if($choices instanceof Jelly_Builder)
 		{
-			$choices = $choices->as_array($choices->meta()->primary_key(), $choices->meta()->name_key());
+			$choices = $choices->select_all();
 		}
+
+		if($choices instanceof Jelly_Collection)
+		{
+			$choices = $choices->as_array($choices->meta()->primary_key(), $choices->meta()->name_key());
+		}		
+
+
 		return $choices;
+	}
+
+	static public function _list_values($values)
+	{
+		if ($values instanceof Jelly_Collection) 
+		{
+			return $values->as_array(null, $values->meta()->primary_key());
+		}
+		else
+		{
+			return $values;
+		}
 	}
 
 	static public function select(Form_Widget $data)
@@ -32,7 +46,7 @@ class Form_Widgets
 			Arr::unshift($choices, '', ($blank === TRUE) ? " -- Select -- " : $blank);
 		}
 
-		return Form::select($data->name(), $choices, $data->value(), $data->attributes()->as_array());
+		return Form::select($data->name(), $choices, self::_list_values($data->value()), $data->attributes()->as_array());
 	}
 
 	static public function date(Form_Widget $data)
@@ -109,10 +123,12 @@ class Form_Widgets
 								 
 		$html = '';
 				 
+		$values =  self::_list_values($data->value());
+
 		foreach(self::_list_choices($data->options('choices')) as $key => $title)
 		{
 			$html .= '<li>'.
-				Form::checkbox($data->name()."[]", $key, $key == $data->value(), array("id" => $data->id().'_'.$key)).
+				Form::checkbox($data->name()."[]", $key, in_array($key, $values), array("id" => $data->id().'_'.$key)).
 				Form::label($data->id().'_'.$key, $title).
 			'</li>';
 		}
