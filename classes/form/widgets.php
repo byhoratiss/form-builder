@@ -58,7 +58,7 @@ class Form_Widgets
 
 	static public function datetime(Form_Widget $data)
 	{
-		$data->attributes()->merge(array('type' => 'date', 'data-type' => 'datetime'));
+		$data->attributes()->merge(array('type' => 'text', 'data-type' => 'datetime'));
 
 		return Form::input($data->name(), $data->value(), $data->attributes()->as_array());
 	}		
