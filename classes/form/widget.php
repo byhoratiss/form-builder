@@ -197,7 +197,8 @@ class Form_Widget
 	 */
 	public function child_prefix()
 	{
-		return call_user_func_array('Form_Builder::generate_prefix', array_merge(array($this->_prefix, $this->field_name()), func_get_args()));
+		$args = func_get_args();
+		return call_user_func_array('Form_Builder::generate_prefix', array_merge(array($this->_prefix, $this->field_name()), $args));
 	}
 
 	/**
