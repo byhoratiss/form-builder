@@ -120,7 +120,7 @@ class Form_Widgets
 	static public function checkboxes(Form_Widget $data)
 	{
 		$data->required('choices');
-								 
+		$data->attributes()->add_class('inputs-list');
 		$html = '';
 				 
 		$values =  self::_list_values($data->value());
@@ -128,8 +128,7 @@ class Form_Widgets
 		foreach(self::_list_choices($data->options('choices')) as $key => $title)
 		{
 			$html .= '<li>'.
-				Form::checkbox($data->name()."[]", $key, in_array($key, $values), array("id" => $data->id().'_'.$key)).
-				Form::label($data->id().'_'.$key, $title).
+				Form::label($data->id().'_'.$key, Form::checkbox($data->name()."[]", $key, in_array($key, $values), array("id" => $data->id().'_'.$key))."<span>$title</span>").
 			'</li>';
 		}
 		return "<ul ".HTML::attributes($data->attributes()->as_array()).">$html</ul>";
@@ -139,6 +138,8 @@ class Form_Widgets
 	static public function radios(Form_Widget $data)
 	{
 		$choices = self::_list_choices($data->required('choices')->options('choices'));
+		$data->attributes()->add_class('inputs-list');
+
 		$html = '';
 
 		if($blank = $data->options('include_blank'))
@@ -149,8 +150,7 @@ class Form_Widgets
 		foreach($choices as $key => $title)
 		{
 			$html .= '<li>'.
-				Form::radio($data->name(), $key, $key == $data->value(), array("id" => $data->id().'_'.$key)).
-				Form::label($data->id().'_'.$key, $title).
+				Form::label($data->id().'_'.$key, Form::radio($data->name(), $key, $key == $data->value(), array("id" => $data->id().'_'.$key))."<span>$title</span>").
 			'</li>';
 		}
 		return "<ul ".HTML::attributes($data->attributes()->as_array()).">$html</ul>";		
