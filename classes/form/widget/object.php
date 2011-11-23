@@ -16,8 +16,8 @@ class Form_Widget_Object extends Form_Widget
 	{
 		$errors = join(', ', Arr::flatten((array) $this->errors()));
 
-		$this->slots(":errors", "<span class=\"field-errors\">{$errors}</span>");
-		$this->slots(":with-errors", $this->errors() ? 'with-errors' : '');
+		$this->slots(":errors", "<span class=\"field-errors\">{$errors}</span>", FALSE);
+		$this->slots(":with-errors", $this->errors() ? 'with-errors' : '', FALSE);
 
 		return parent::render();
 	}
