@@ -131,6 +131,7 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 		catch(Jelly_Validation_Exception $e)
 		{
 			$this->_errors = $e->errors($this->_error_file);
+			$this->_errors = Arr::merge($this->_errors, Arr::get($this->_errors, '_external', array()));
 
 			$this->data(Arr::merge((array) $this->_data, $this->_object->as_array() ));
 
