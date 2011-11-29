@@ -31,6 +31,10 @@ class Form_Widgets
 		{
 			return $values->as_array(null, $values->meta()->primary_key());
 		}
+		elseif ($values instanceof Jelly_Model)
+		{
+			return $values->{$values->meta()->primary_key()};
+		}
 		else
 		{
 			return $values;
