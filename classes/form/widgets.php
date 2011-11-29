@@ -159,4 +159,9 @@ class Form_Widgets
 		}
 		return "<ul ".HTML::attributes($data->attributes()->as_array()).">$html</ul>";		
 	}
+	
+	static public function upload_image(Form_Widget $data) {
+		return Form::file($data->name(), $data->attributes()->as_array());
+	}
+	
 }
