@@ -5,7 +5,7 @@
  *
  * @package Form_Builder
  */
-class Form_Builder_ValidaitonTest extends Kohana_Unittest_TestCase {
+class Form_Builder_ValidationTest extends Kohana_Unittest_TestCase {
 
 	public function test_validation()
 	{

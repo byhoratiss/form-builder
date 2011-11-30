@@ -47,7 +47,7 @@ The rows method has those arguments:
 - __$options__ an array of options that modify the behaviour
 	- _template_ add a custom template
 	- _label_ set the label text, human version of the $name is used as a default
-	- _errors_ the errors for the field (Validation or Jelly) defaults with the errors for this field from the validaiton
+	- _errors_ the errors for the field (Validation or Jelly) defaults with the errors for this field from the validation
 	-	_object_ (Validaiton or Jelly) defaults to the current object
 - __$attributes__ html attributes for the input. id and name are prefilled by default. Jelly also sets HTML5 validation based on the database field
 
@@ -63,7 +63,7 @@ Uses the same arguments but only returns the field without the template - you ca
 		<?php endif ?>
 	</div>
 
-## Validaiton form
+## Validation form
 
 You can use Kohana's built in validation object to create forms independant from ORMs. For example:
 

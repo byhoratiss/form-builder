@@ -150,8 +150,9 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 
 			if( ! $item->loaded() OR $item->changed())
 			{
-				$item->save();	
+				$item->save();
 			}
+			
 			return $load_by_id ? $item : $item->id();
 		}
 		elseif($load_by_id)
