@@ -25,7 +25,9 @@ class Form_Builder
 		if(is_string($name))
 		{
 			$args = func_get_args();
-			return call_user_func_array(array(self::$_builder_prefix.$name, '__construct'), array_slice($args, 1));
+			$class = new ReflectionClass(self::$_builder_prefix.$name); 
+
+			return $class->newInstanceArgs(array_slice($args, 1));
 		}
 		else
 		{
