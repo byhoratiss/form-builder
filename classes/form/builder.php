@@ -11,29 +11,26 @@ class Form_Builder
 	protected $_data = null;
 	protected $_prefix = '%s';
 
+	static protected $_builder_prefix = 'Form_Builder_';
+
 	/**
-	 * Return a ready Form_Builder object, based on the type of the argument
-	 * * Array - Form_Builder
-	 * * Validation - Form_Builder_Validation
-	 * * Jelly_Model - Form_Jelly_Model
-	 * @param mixed $object
+	 * Return a ready Form_Builder object
+	 * You can specify which form builder class you want. The first argument can be a name so for example Form_Builder_Jelly can be Form_Builder::factory('jelly', $model, $data);
+	 * @param mixed $name
 	 * @param array $data 
 	 * @return Form_Builder
 	 */
-	static public function factory($object, $data = null)
+	static public function factory($name, $data = null)
 	{
-		if( $object instanceof Jelly_Model)
+		if(is_string($name))
 		{
-			return new Form_Builder_Jelly($object, $data);
-		}
-		elseif($object instanceof Validation)
-		{
-			return new Form_Builder_Validation($object);
+			$args = func_get_args();
+			return call_user_func_array(array(self::$_builder_prefix.$name, '__construct'), array_slice($args, 1));
 		}
 		else
 		{
-			return new Form_Builder($object);	
-		}
+			return new Form_Builder($name);	
+		}		
 	}
 
 	function __construct($data = null)

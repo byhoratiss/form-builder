@@ -12,11 +12,11 @@ class Form_BuilderTest extends Kohana_Unittest_TestCase {
 		$this->assertInstanceOf('Form_Builder', Form_Builder::factory(array("test")));
 
 		$validation = $this->getMockBuilder("Validation")->disableOriginalConstructor()->getMock();
-		$this->assertInstanceOf('Form_Builder_Validation', Form_Builder::factory($validation));
+		$this->assertInstanceOf('Form_Builder_Validation', Form_Builder::factory('validation', $validation));
 
 		$jelly_model = $this->getMockBuilder("Jelly_Model")->disableOriginalConstructor()->getMock();
 		$jelly_model->expects($this->any())->method('as_array')->will($this->returnValue(array()));
-		$this->assertInstanceOf('Form_Builder_Jelly', Form_Builder::factory($jelly_model));		
+		$this->assertInstanceOf('Form_Builder_Jelly', Form_Builder::factory('jelly', $jelly_model));		
 	}
 
 	public function test_getters()

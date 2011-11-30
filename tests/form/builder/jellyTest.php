@@ -11,7 +11,7 @@ class Form_Builder_JellyTest extends Kohana_Unittest_TestCase {
 	public function test_getters()
 	{
 		$jelly = new Model_Test_Entry();
-		$form = Form_Builder::factory($jelly, array("name" => "new_name"));
+		$form = Form_Builder::factory('jelly', $jelly, array("name" => "new_name"));
 
 		$this->assertEquals($jelly, $form->object(), "Should have a default object");
 		$this->assertEquals(null, $form->error_file(), "Should not have an error file set by default");
@@ -40,7 +40,7 @@ class Form_Builder_JellyTest extends Kohana_Unittest_TestCase {
 		$jelly->expects($this->at(1))->method("check")->will($this->throwException(new Jelly_Validation_Exception("model_test", Validation::factory(array())->error("name", "error"))));
 		$jelly->expects($this->at(2))->method("check")->will($this->returnValue(true));
 
-		$form = Form_Builder::factory($jelly,  array("test" => "default", "name" => 'test'));
+		$form = Form_Builder::factory('jelly', $jelly,  array("test" => "default", "name" => 'test'));
 		$this->assertArrayHasKey("id", $form->data());
 		$this->assertArrayHasKey("name", $form->data());
 		$this->assertArrayHasKey("email", $form->data());

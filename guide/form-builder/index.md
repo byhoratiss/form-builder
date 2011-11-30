@@ -23,8 +23,8 @@ You can also set a "prefix" for the form inputs. It will use it for each input n
 
 The factory method handles Array, Validation object and Jelly_Model
 
-	$form = Form_Builder::factory($jelly_model, $_POST); //Creates Form_Jelly_Builder
-	$form = Form_Builder::factory($validation_object); //Creates Form_Validation_Builder
+	$form = Form_Builder::factory('jelly', $jelly_model, $_POST); //Creates Form_Jelly_Builder
+	$form = Form_Builder::factory('validation', $validation_object); //Creates Form_Validation_Builder
 	$form = Form_Builder::factory($array); //Creates Form_Builder
 
 ## Form rows and fields
@@ -69,6 +69,7 @@ You can use Kohana's built in validation object to create forms independant from
 
 	//Controller
 	$form = Form_Builder::factory(
+		'validation',
 		Validation::factory($_POST)
 			->rule("username", "not_empty")
 			->rule("password", "not_empty")
@@ -90,7 +91,7 @@ You can use Kohana's built in validation object to create forms independant from
 ## Jelly form
 
 	//Controller
-	$form = Form_Builder::factory(Jelly::factory("user", $id), Arr::merge($_POST, $_FILES));
+	$form = Form_Builder::factory('jelly', Jelly::factory("user", $id), Arr::merge($_POST, $_FILES));
 
 	$form->error_file("path/to/errors");
 

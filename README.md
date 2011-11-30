@@ -8,7 +8,7 @@ In the controller
 ``` php
 <?php
 	$book = Jelly::factory('book', 20);
-	$form = Form_Builder::factory($book, $_POST);
+	$form = Form_Builder::factory('jelly', $book, $_POST);
 
 	if($this->request->method() == 'post' AND $form->check())
 	{
@@ -40,8 +40,8 @@ You create forms based on Arrays, Validation objects of Jelly Models.
 ``` php
 <?php
 $array_form = Form_Builder::factory($_POST);
-$validation_form = Form_Builder::factory(Validation::factory($_POST)->rules( /* ... */ ));
-$jelly_form = Form_Builder::factory(Jelly::factory('book', 10));
+$validation_form = Form_Builder::factory('validation', Validation::factory($_POST)->rules( /* ... */ ));
+$jelly_form = Form_Builder::factory('jelly', Jelly::factory('book', 10));
 ?>
 ```
 

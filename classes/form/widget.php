@@ -8,6 +8,8 @@
  */
 class Form_Widget
 {
+	static protected $_widgets_prefix = 'Form_Widgets_';
+
 	protected $_template = '<div class="row :type-field :name-row">:label:field</div>';
 	protected $_attributes = array();
 	protected $_slots = array(
@@ -146,9 +148,9 @@ class Form_Widget
 		{
 			$callback = explode('::', $callback);
 
-			$callback[0] = 'Form_Widgets_'.ucfirst($callback[0]);
+			$callback[0] = self::$_widgets_prefix.ucfirst($callback[0]);
 		}
-		return $callback;		
+		return $callback;
 	}
 
 	/**
@@ -307,5 +309,5 @@ class Form_Widget
 		}
 
 		return $this->_items;
-	}		
+	}
 }

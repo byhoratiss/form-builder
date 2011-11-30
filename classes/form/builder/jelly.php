@@ -11,6 +11,16 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 	protected $_original_data = array();
 	protected $_html5_validation = true;
 
+	static protected $_additional_filters = array(
+		'belongsto' => array('Form_Builder_Jelly::_filter_belongsto', ':field', ':value'),
+		'hasmany' => array('Form_Builder_Jelly::_filter_many', ':field', ':value'),
+		'polymorphic_hasmany' => array('Form_Builder_Jelly::_filter_polymorphic_hasmany', ':field', ':value'),
+		'polymorphic_belongsto' => array('Form_Builder_Jelly::_filter_polymorphic_belongsto', ':field', ':value'),
+		'manytomany' => array('Form_Builder_Jelly::_filter_many',':field', ':value'),
+	);
+
+	static protected $_filteres_applied = array();
+
 	public function widget($name)
 	{
 		$widget = parent::widget($name);
@@ -62,6 +72,21 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 	{
 		$this->object($object);
 
+		foreach(Jelly::meta($object)->fields() as $field)
+		{
+			if ( ! isset($field->filters['jelly_form']))
+			{
+				foreach (self::$_additinal_filters as $field_name => $field_filter) 
+				{
+					if(Jelly::field_prefix().$field_name == get_class($field))
+					{
+						$field->filters['jelly_form'] = $field_filter;
+						break;	
+					}
+				}
+			}
+		}
+
 		$this->data((array) $data);	
 	}
 
@@ -83,35 +108,6 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 
 	public function check($save = FALSE, $extra_validation = null)
 	{
-		foreach( $this->_data as $field => &$field_data)
-		{
-			$field = $this->object()->meta()->field($field);
-			if(($field instanceof Jelly_Field_ManyToMany) || ($field instanceof Jelly_Field_HasMany ))
-			{
-				if ($field_data AND is_array($field_data))
-				{
-					foreach( $field_data as $i => &$item_data)
-					{
-						if(is_array($item_data))
-						{
-							$id = Arr::get($item_data, Jelly::meta($field->foreign['model'])->primary_key(), null);
-
-							if( ! $id )
-							{
-								unset($item_data[ Jelly::meta($field->foreign['model'])->primary_key()]);
-							}
-							$item = Jelly::factory($field->foreign['model'], $id)->set($item_data);
-							if( ! $item->loaded() OR $item->changed())
-							{
-								$item->save();	
-							}
-
-							$item_data = $item;
-						}
-					}
-				}
-			}
-		}
 		$this->_object->set($this->_data);
 
 		try{
@@ -139,4 +135,81 @@ class Form_Builder_Jelly extends Form_Builder_Validation
 		}
 	}
 
+	static protected function _covert_to_item($type, $item_data, $load_by_id = FALSE)
+	{
+		if(is_array($item_data))
+		{
+			$id = Arr::get($item_data, Jelly::meta($type)->primary_key(), null);
+
+			if( ! $id )
+			{
+				unset($item_data[ Jelly::meta($type)->primary_key()]);
+			}
+			
+			$item = Jelly::factory($type, $id)->set($item_data);
+			if( ! $item->loaded() OR $item->changed())
+			{
+				$item->save();	
+			}
+			return $item;
+		}
+		elseif($load_by_id)
+		{
+			return Jelly::factory($type, $item_data);
+		}
+		return $item_data;
+	}	
+
+	static protected function _filter_many($field, $value)
+	{
+		if (is_array($value))
+		{
+			foreach( $value as $i => &$item_data)
+			{
+				$item_data = self::_covert_to_item($field->foreign['model'], $item_data, FALSE);
+			}
+		}
+		return $value;
+	}
+
+	static protected function _filter_belongsto($field, $value)
+	{
+		if (is_array($value))
+		{
+			$value = self::_covert_to_item($field->foreign['model'], $value, FALSE);
+		}		
+		return $value;
+	}
+
+	static protected function _filter_polymorphic_belongsto($field, $value)
+	{
+		if (is_array($value))
+		{
+			$value = self::_covert_to_item(key($value), reset($value), TRUE);
+		}		
+		return $value;
+	}
+
+	static protected function _filter_polymorphic_hasmany($field, $value)
+	{
+		if (is_array($field_data))
+		{
+			$loaded_items = array();
+
+			foreach( $value as $type => $items)
+			{
+				if(is_array($items))
+				{
+					foreach($items as $item_data)
+					{
+						$loaded_items[] = self::_covert_to_item($type, $item_data, TRUE);
+					}
+				}
+			}
+
+			$value = $loaded_items;
+		}
+
+		return $value;
+	}	
 }
